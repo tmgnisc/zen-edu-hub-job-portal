@@ -1,19 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar/Navbar';
+import Header from './components/Header/Header';
+import Steps from './components/Steps/Steps';
+import Explore from './components/Explore/Explore';
+import Jobs from './components/Jobs/Jobs';
+import Footer from './components/Footer/Footer';
+import WhatWeOffer from './components/Footer/WhatWeOffer';
+import JobsPage from './pages/JobsPage';
+import LoginSignupPage from './pages/LoginSignupPage';
+import JobDetailsPage from './pages/JobDetailsPage';
+import About from './components/About/About';
+import ProfilePage from './pages/ProfilePage';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-200">
-    <div className="p-8 bg-white rounded-2xl shadow-lg text-center">
-      <h1 className="text-4xl font-bold text-blue-600 mb-4">🎉 Tailwind is Working!</h1>
-      <p className="text-gray-600">You're ready to build Zen Edu Hub 🚀</p>
-    </div>
-  </div>
-  )
+    <>
+      <Header />
+      <Steps />
+      <Explore />
+      <Jobs />
+      <WhatWeOffer />
+      <Footer />
+    </>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/jobs" element={<JobsPage />} />
+        <Route path="/jobs/:id" element={<JobDetailsPage />} />
+        <Route path="/login" element={<LoginSignupPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
