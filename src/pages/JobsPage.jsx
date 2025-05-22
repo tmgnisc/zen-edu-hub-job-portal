@@ -8,6 +8,8 @@ import linkedinLogo from '../assets/linkedin.png';
 import amazonLogo from '../assets/amazon.png';
 import microsoftLogo from '../assets/microsoft.png';
 import twitterLogo from '../assets/twitter.png';
+// Import the getJobs function from your apiService
+import { getJobs } from '../api/apiService';
 
 const logoMap = {
   'figma.png': figmaLogo,
@@ -22,6 +24,13 @@ const getLogo = (logo) => {
   return logoMap[logo] || '';
 };
 
+// Utility function to strip HTML tags from a string
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
+
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,15 +39,32 @@ const JobsPage = () => {
   const jobsPerPage = 6;
   const navigate = useNavigate();
 
+  // State for filtering and search
+  const [allActiveJobs, setAllActiveJobs] = useState([]); // Store all active/non-expired jobs
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [selectedLocation, setSelectedLocation] = useState('All Locations');
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('https://zenedu.everestwc.com/api/jobs/');
-        if (!response.ok) {
-          throw new Error('Failed to fetch jobs');
-        }
-        const data = await response.json();
-        setJobs(data);
+        // Use the getJobs function from apiService
+        const data = await getJobs();
+
+        // Filter jobs: keep only active jobs with a deadline in the future or today
+        const filteredJobs = data.filter(job => {
+          const deadlineDate = new Date(job.deadline);
+          const today = new Date();
+          // Set time to midnight for accurate date comparison
+          today.setHours(0, 0, 0, 0);
+          
+          return job.is_active && deadlineDate >= today;
+        });
+
+        // Store all active/non-expired jobs and set the initial jobs to display
+        setAllActiveJobs(filteredJobs);
+        setJobs(filteredJobs); // Initially display all active/non-expired jobs
+
       } catch (err) {
         setError(err.message);
       } finally {
@@ -48,6 +74,38 @@ const JobsPage = () => {
 
     fetchJobs();
   }, []);
+
+  // Effect to filter jobs based on search and filter criteria
+  useEffect(() => {
+    const filterJobs = () => {
+      let filtered = allActiveJobs;
+
+      // Filter by search term (case-insensitive)
+      if (searchTerm) {
+        filtered = filtered.filter(job =>
+          job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.job_description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      // Filter by category
+      if (selectedCategory !== 'All Categories') {
+        filtered = filtered.filter(job => job.job_category.name === selectedCategory);
+      }
+
+      // Filter by location (assuming job.company.location contains the location string)
+      if (selectedLocation !== 'All Locations') {
+         filtered = filtered.filter(job => job.company.location.includes(selectedLocation));
+      }
+
+      setJobs(filtered);
+      setPage(1); // Reset to the first page after filtering
+    };
+
+    filterJobs();
+
+  }, [allActiveJobs, searchTerm, selectedCategory, selectedLocation]); // Rerun when filters or initial jobs change
 
   const totalPages = Math.ceil(jobs.length / jobsPerPage);
   const displayedJobs = jobs.slice((page - 1) * jobsPerPage, page * jobsPerPage);
@@ -86,27 +144,42 @@ const JobsPage = () => {
         <h1 className="text-4xl font-bold mb-8 text-center">Job Openings</h1>
         {/* Filter Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-10 flex flex-wrap gap-4 items-center justify-between">
-          <input type="text" placeholder="Search jobs, companies, or keywords" className="flex-1 px-4 py-2 border rounded-md focus:outline-none text-gray-800" />
-          <select className="px-4 py-2 border rounded-md focus:outline-none text-gray-800">
+          <input 
+            type="text" 
+            placeholder="Search jobs, companies, or keywords" 
+            className="flex-1 px-4 py-2 border rounded-md focus:outline-none text-gray-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select 
+            className="px-4 py-2 border rounded-md focus:outline-none text-gray-800"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
             <option>All Categories</option>
-            <option>Technology</option>
-            <option>Design</option>
-            <option>Marketing</option>
-            <option>Sales</option>
+            <option value="Technology">Technology</option>
+            <option value="Design">Design</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Sales">Sales</option>
           </select>
-          <select className="px-4 py-2 border rounded-md focus:outline-none text-gray-800">
+          <select 
+            className="px-4 py-2 border rounded-md focus:outline-none text-gray-800"
+            value={selectedLocation}
+            onChange={(e) => setSelectedLocation(e.target.value)}
+          >
             <option>All Locations</option>
-            <option>USA</option>
-            <option>Germany</option>
-            <option>UK</option>
-            <option>Remote</option>
+            <option value="USA">USA</option>
+            <option value="Germany">Germany</option>
+            <option value="UK">UK</option>
+            <option value="Remote">Remote</option>
           </select>
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-            <FaSearch className="mr-2" />
-            Search
-          </button>
         </div>
         {/* Job Openings List */}
+        {jobs.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-600 text-lg">No jobs found matching your criteria.</p>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {displayedJobs.map((job) => (
             <div 
@@ -126,15 +199,17 @@ const JobsPage = () => {
                 </div>
               </div>
               <h4 className="text-xl font-semibold mb-3">{job.job_title}</h4>
-              <p className="text-gray-600 mb-4">{job.job_description}</p>
+              <p className="text-gray-600 mb-4 line-clamp-3">{stripHtml(job.job_description)}</p>
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full">{job.number_of_people} Positions</span>
                 <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full">{job.job_type}</span>
-                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full">${job.salary_range}/Year</span>
+                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full">${job.salary_range}/Month</span>
+                <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full">Apply before: {new Date(job.deadline).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
         </div>
+        )}
         {/* Pagination */}
         {jobs.length > jobsPerPage && (
           <div className="flex justify-center gap-2">

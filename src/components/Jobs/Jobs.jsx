@@ -1,20 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getJobs } from '../../api/apiService';
 
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('https://zenedu.everestwc.com/api/jobs/');
-        if (!response.ok) {
-          throw new Error('Failed to fetch jobs');
-        }
-        const data = await response.json();
-        setJobs(data);
+        const data = await getJobs();
+
+        const filteredJobs = data.filter(job => {
+          const deadlineDate = new Date(job.deadline);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          return job.is_active && deadlineDate >= today;
+        });
+
+        setJobs(filteredJobs);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -66,7 +74,8 @@ const Jobs = () => {
           {jobs.map((job) => (
             <div
               key={job.id}
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => navigate(`/jobs/${job.id}`)}
             >
               <div className="flex items-center mb-4">
                 <img
@@ -80,11 +89,12 @@ const Jobs = () => {
                 </div>
               </div>
               <h4 className="text-xl font-semibold mb-3">{job.job_title}</h4>
-              <p className="text-gray-600 mb-4">{job.job_description}</p>
+              <p className="text-gray-600 mb-4 line-clamp-3">{job.job_description}</p>
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 <span>{job.number_of_people} Positions</span>
                 <span>{job.job_type}</span>
                 <span>${job.salary_range}/Year</span>
+                <span className="text-red-600">Apply before: {new Date(job.deadline).toLocaleDateString()}</span>
               </div>
             </div>
           ))}

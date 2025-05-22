@@ -1,62 +1,61 @@
-import React, { useEffect } from 'react';
-import { FaPencilRuler, FaChartBar, FaBullhorn, FaWallet, FaCar, FaTruck, FaUserTie, FaBuilding } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaPencilRuler, FaChartBar, FaBullhorn, FaWallet, FaCar, FaTruck, FaUserTie, FaBuilding, FaBriefcase } from 'react-icons/fa';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { getCategoriesWithCount } from '../../api/apiService';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const categories = [
-  {
-    icon: <FaPencilRuler className="text-4xl text-orange-500" />,
-    bg: 'bg-orange-100',
-    title: 'Design',
-    jobs: '200+',
-  },
-  {
-    icon: <FaChartBar className="text-4xl text-purple-500" />,
-    bg: 'bg-purple-100',
-    title: 'Sales',
-    jobs: '350+',
-  },
-  {
-    icon: <FaBullhorn className="text-4xl text-red-500" />,
-    bg: 'bg-red-100',
-    title: 'Marketing',
-    jobs: '500+',
-  },
-  {
-    icon: <FaWallet className="text-4xl text-yellow-500" />,
-    bg: 'bg-yellow-100',
-    title: 'Finance',
-    jobs: '200+',
-  },
-  {
-    icon: <FaCar className="text-4xl text-blue-500" />,
-    bg: 'bg-blue-100',
-    title: 'Automobile',
-    jobs: '250+',
-  },
-  {
-    icon: <FaTruck className="text-4xl text-green-500" />,
-    bg: 'bg-green-100',
-    title: 'Logistics / Delivery',
-    jobs: '1k+',
-  },
-  {
-    icon: <FaUserTie className="text-4xl text-indigo-500" />,
-    bg: 'bg-indigo-100',
-    title: 'Admin',
-    jobs: '100+',
-  },
-  {
-    icon: <FaBuilding className="text-4xl text-teal-500" />,
-    bg: 'bg-teal-100',
-    title: 'Construction',
-    jobs: '500+',
-  },
+// Array of available icon and style combinations
+const categoryStyles = [
+  { icon: <FaPencilRuler className="text-4xl text-orange-500" />, bg: 'bg-orange-100' },
+  { icon: <FaChartBar className="text-4xl text-purple-500" />, bg: 'bg-purple-100' },
+  { icon: <FaBullhorn className="text-4xl text-red-500" />, bg: 'bg-red-100' },
+  { icon: <FaWallet className="text-4xl text-yellow-500" />, bg: 'bg-yellow-100' },
+  { icon: <FaCar className="text-4xl text-blue-500" />, bg: 'bg-blue-100' },
+  { icon: <FaTruck className="text-4xl text-green-500" />, bg: 'bg-green-100' },
+  { icon: <FaUserTie className="text-4xl text-indigo-500" />, bg: 'bg-indigo-100' },
+  { icon: <FaBuilding className="text-4xl text-teal-500" />, bg: 'bg-teal-500' },
+  { icon: <FaBriefcase className="text-4xl text-gray-500" />, bg: 'bg-gray-100' }, // Add default/fallback icon to the list
 ];
 
 const Explore = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategoriesWithCount();
+
+        // Take the first 8 categories and map API data to the structure needed for rendering
+        const mappedCategories = data.slice(0, 8).map((category, index) => {
+           // Calculate index for random style assignment (loop through styles if more than available)
+           const styleIndex = index % categoryStyles.length;
+           const randomStyle = categoryStyles[styleIndex];
+
+          return {
+            ...category, // Include id and name from API
+            title: category.name, // Use name as title
+            jobs: `${category.job_count}+`, // Format job count
+            // Assign icon and background randomly from the available styles
+            icon: randomStyle.icon,
+            bg: randomStyle.bg,
+          };
+        });
+
+        setCategories(mappedCategories);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []); // Empty dependency array means this runs once on mount
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Section title animation
@@ -104,6 +103,19 @@ const Explore = () => {
           </p>
         </div>
 
+        {loading && (
+          <div className="text-center">
+            <p>Loading categories...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center text-red-600">
+            <p>Error fetching categories: {error}</p>
+          </div>
+        )}
+
+        {!loading && !error && categories.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {categories.map((category, index) => (
             <div
@@ -118,6 +130,14 @@ const Explore = () => {
             </div>
           ))}
         </div>
+        )}
+
+        {/* Display message if no categories are found after loading */}
+        {!loading && !error && categories.length === 0 && (
+          <div className="text-center py-10">
+            <p className="text-gray-600 text-lg">No job categories found.</p>
+          </div>
+        )}
 
         <div className="text-center mt-12">
           <button className="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold text-lg shadow-md">
