@@ -203,7 +203,7 @@ const JobsPage = () => {
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full">{job.number_of_people} Positions</span>
                 <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full">{job.job_type}</span>
-                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full">${job.salary_range}/Month</span>
+                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full">{job.salary_range}/Month</span>
                 <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full">Apply before: {new Date(job.deadline).toLocaleDateString()}</span>
               </div>
             </div>
