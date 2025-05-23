@@ -186,7 +186,7 @@ const JobDetailsPage = () => {
               <div><span className="font-semibold">No. of Vacancies:</span> {job.number_of_people}</div>
               <div><span className="font-semibold">Employment Type:</span> {job.job_type}</div>
               <div><span className="font-semibold">Job Location:</span> {job.company.location}</div>
-              <div><span className="font-semibold">Offered Salary:</span> ${job.salary_range}/Year</div>
+              <div><span className="font-semibold">Offered Salary:</span> AED {job.salary_range}/Month</div>
               <div><span className="font-semibold">Apply Before:</span> {new Date(job.deadline).toLocaleDateString()}</div>
               <div><span className="font-semibold">Total Applications:</span> {job.applicant_count}</div>
             </div>

@@ -1,45 +1,71 @@
 import React from 'react';
+import ContactForm from '../components/ContactForm';
+import ContactInfo from '../components/ContactInfo';
+import GoogleMap from '../components/GoogleMap';
+import { MapPinIcon, PhoneIcon, MailIcon } from 'lucide-react';
 
-export default function ContactPage() {
+const ContactPage = () => {
   return (
-    <div className="container mx-auto px-4 py-16 min-h-screen flex flex-col items-center justify-center bg-white">
-      <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-8 text-center">Contact Us</h1>
-      <div className="w-full max-w-5xl grid md:grid-cols-2 gap-10 items-start">
-        <div className="bg-blue-50 rounded-2xl shadow-lg p-8 flex flex-col space-y-6 border border-blue-100">
-          <div>
-            <h2 className="text-2xl font-semibold text-blue-700 mb-2">Address:</h2>
-            <p className="text-gray-700 leading-relaxed">
-              Office 402, Sultan Group Investments Building<br />
-              Al Ittihad Road, Opposite The Emirates Group<br />
-              Al Khabaisi, Dubai, UAE
-            </p>
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-blue-700 mb-2">Phone:</h2>
-            <a href="tel:0566214420" className="text-blue-600 hover:underline text-lg font-medium">0566214420</a>
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-blue-700 mb-2">Email:</h2>
-            <a href="mailto:info@zencareerhub.ae" className="text-blue-600 hover:underline text-lg font-medium">info@zencareerhub.ae</a>
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-blue-700 mb-2">Website:</h2>
-            <a href="https://zencareerhub.ae" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-lg font-medium">zencareerhub.ae</a>
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      {/* Header */}
+      <header className="bg-blue-600 text-white">
+        <div className="container mx-auto px-4 py-16 md:py-24 text-center">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 animate-fade-in">Get In Touch</h1>
+          <p className="max-w-2xl mx-auto text-blue-100 md:text-lg">
+            We're here to help with your career needs. Reach out to us through any of the channels below.
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-6 mt-8">
+            <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+              <MapPinIcon className="h-5 w-5 text-blue-200" />
+              <span className="text-sm md:text-base">Dubai, UAE</span>
+            </div>
+            <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+              <PhoneIcon className="h-5 w-5 text-blue-200" />
+              <span className="text-sm md:text-base">+971 56 621 4420</span>
+            </div>
+            <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+              <MailIcon className="h-5 w-5 text-blue-200" />
+              <span className="text-sm md:text-base">info@zencareerhub.ae</span>
+            </div>
           </div>
         </div>
-        <div className="rounded-2xl overflow-hidden shadow-lg border border-blue-100">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4529.234445792412!2d55.330477176224164!3d25.258716377671398!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5cde82ccec0b%3A0x6f93373c4b07f73a!2sSultan%20Group%20Investments!5e1!3m2!1sen!2snp!4v1747912698730!5m2!1sen!2snp"
-            width="100%"
-            height="400"
-            style={{ border: 0 }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="ZEN Career Hub Location"
-          ></iframe>
+      </header>
+      
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-12 md:py-16">
+        <div className="max-w-7xl mx-auto">
+          {/* Contact Cards Section */}
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 -mt-16 md:-mt-24">
+            {/* Contact Form Card */}
+            <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6 md:p-8 transform transition-all duration-300 hover:shadow-2xl">
+              <ContactForm />
+            </div>
+            
+            {/* Contact Info Card */}
+            <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6 md:p-8 transform transition-all duration-300 hover:shadow-2xl">
+              <ContactInfo />
+            </div>
+          </div>
+          
+          {/* Map Section */}
+          <div className="mt-12 md:mt-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">Visit Our Office</h2>
+            <GoogleMap />
+          </div>
         </div>
-      </div>
+      </main>
+      
+      {/* Footer */}
+      <footer className="bg-gray-50 border-t border-gray-200 mt-16">
+        <div className="container mx-auto px-4 py-8">
+          <p className="text-center text-gray-500 text-sm">
+            © {new Date().getFullYear()} ZEN Career Hub. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
-} 
+};
+
+export default ContactPage;

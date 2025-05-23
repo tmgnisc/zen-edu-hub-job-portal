@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate,useLocation } from 'react-router-dom';
 import zenLogo from '../../assets/final logo .png';
 
 const Navbar = () => {
@@ -9,7 +9,9 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-
+  const location = useLocation();
+  const isContactPage = location.pathname === '/contact';
+  
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -52,7 +54,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`${scrolled ? 'bg-white shadow-md' : 'bg-transparent shadow-none'} fixed w-full z-50 transition-all duration-300`}>
+<nav className={`${scrolled ? 'bg-white shadow-md' : isContactPage ? 'bg-blue-600' : 'bg-transparent shadow-none'} fixed w-full z-50 transition-all duration-300`}>
+
       <div className="container mx-auto px-4">
         <div className="flex justify-between h-20">
           <div className="flex items-center pl-2">
@@ -66,10 +69,13 @@ const Navbar = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About</Link>
-            <Link to="/jobs" className="text-gray-700 hover:text-blue-600 transition-colors">Jobs</Link>
-            <Link to="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">Contact</Link>
+            <Link to="/" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>Home</Link>
+            <Link to="/about" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>About</Link>
+            <Link to="/jobs" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>Jobs</Link>
+            <Link to="/contact" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>
+  Contact
+</Link>
+
            
             {user ? (
               <div className="relative">
@@ -121,9 +127,17 @@ const Navbar = () => {
                 )}
               </div>
             ) : (
-              <Link to="/login" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center">
-                Register
-              </Link>
+              <Link
+  to="/login"
+  className={`px-6 py-2 rounded-lg transition-colors text-center ${
+    isContactPage && !scrolled
+      ? 'bg-white text-blue-600 hover:bg-gray-100'
+      : 'bg-blue-600 text-white hover:bg-blue-700'
+  }`}
+>
+  Register
+</Link>
+
             )}
           </div>
 

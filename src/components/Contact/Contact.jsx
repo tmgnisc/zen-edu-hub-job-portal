@@ -16,41 +16,42 @@ const Contact = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="space-y-8 animate-fade-in">
-            <div className="bg-white p-8 rounded-2xl shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Our Location</h3>
-              <div className="space-y-4">
+            <div className="bg-white p-8 rounded-2xl shadow-xl border border-blue-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Reach Out</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex items-start space-x-4">
-                  <FaMapMarkerAlt className="text-blue-600 text-xl mt-1" />
+                  <FaMapMarkerAlt className="text-blue-600 text-2xl mt-1 flex-shrink-0" />
                   <div>
-                    <p className="text-gray-600">
+                    <h4 className="font-semibold text-gray-800 mb-1">Address</h4>
+                    <p className="text-gray-600 leading-relaxed">
                       Office 402, Sultan Group Investments Building<br />
                       Al Ittihad Road, Opposite The Emirates Group<br />
                       Al Khabaisi, Dubai, UAE
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <FaPhone className="text-blue-600 text-xl" />
-                  <a href="tel:+971566214420" className="text-gray-600 hover:text-blue-600">
-                    +971 56 621 4420
-                  </a>
+                <div className="flex items-start space-x-4">
+                  <FaPhone className="text-blue-600 text-2xl flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Phone</h4>
+                    <a href="tel:+971566214420" className="text-gray-600 hover:text-blue-600 text-lg">
+                      +971 56 621 4420
+                    </a>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <FaEnvelope className="text-blue-600 text-xl" />
-                  <a href="mailto:info@zencareerhub.ae" className="text-gray-600 hover:text-blue-600">
-                    info@zencareerhub.ae
-                  </a>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <FaGlobe className="text-blue-600 text-xl" />
-                  <a href="https://zencareerhub.ae" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
-                    zencareerhub.ae
-                  </a>
+                <div className="flex items-start space-x-4">
+                  <FaEnvelope className="text-blue-600 text-2xl flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Email</h4>
+                    <a href="mailto:info@zencareerhub.ae" className="text-gray-600 hover:text-blue-600 text-lg">
+                      info@zencareerhub.ae
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <div className="bg-white p-8 rounded-2xl shadow-xl border border-blue-100">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Business Hours</h3>
               <div className="space-y-2 text-gray-600">
                 <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
