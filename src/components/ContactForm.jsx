@@ -7,6 +7,7 @@ const ContactForm = () => {
     email: '',
     phone: '',
     message: '',
+    howHear: '',
   });
   
   const [errors, setErrors] = useState({});
@@ -59,6 +60,7 @@ const ContactForm = () => {
           email: '',
           phone: '',
           message: '',
+          howHear: '',
         });
         
         // Reset success message after 5 seconds
@@ -146,6 +148,21 @@ const ContactForm = () => {
           placeholder="How can we help you?"
         />
         {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
+      </div>
+      
+      <div>
+        <label htmlFor="howHear" className="block text-sm font-medium text-gray-700 mb-1">
+          How did you hear about us? (optional)
+        </label>
+        <input
+          type="text"
+          id="howHear"
+          name="howHear"
+          value={formData.howHear}
+          onChange={handleChange}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+          placeholder="e.g., Google, Friend, Social Media"
+        />
       </div>
       
       <button

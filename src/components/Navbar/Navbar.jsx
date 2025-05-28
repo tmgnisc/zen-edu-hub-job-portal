@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
 import { Link, useNavigate,useLocation } from 'react-router-dom';
-import zenLogo from '../../assets/final logo .png';
+import zenLogo from '../../assets/ZEN LLC LOGO.svg';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -56,29 +56,30 @@ const Navbar = () => {
   return (
 <nav className={`${scrolled ? 'bg-white shadow-md' : isContactPage ? 'bg-blue-600' : 'bg-transparent shadow-none'} fixed w-full z-50 transition-all duration-300`}>
 
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between h-20">
-          <div className="flex items-center pl-2">
+      <div className="container mx-auto">
+        <div className="flex justify-between h-20 items-center px-4 md:px-20">
+          <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
               <img 
                 src={zenLogo} 
                 alt="Zen Career Hub" 
-                className="h-32 md:h-40 lg:h-44 w-auto object-contain"
+                className="h-16 md:h-32 w-auto object-contain"
               />
             </Link>
           </div>
-          
-          <div className="hidden md:flex items-center space-x-8">
+
+          <div className="flex-grow hidden md:flex justify-center items-center space-x-8">
             <Link to="/" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>Home</Link>
             <Link to="/about" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>About</Link>
             <Link to="/jobs" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>Jobs</Link>
             <Link to="/contact" className={`${isContactPage && !scrolled ? 'text-white' : 'text-gray-700'} hover:text-blue-600 transition-colors`}>
-  Contact
+Contact
 </Link>
+          </div>
 
-           
+          <div className="flex items-center space-x-4">
             {user ? (
-              <div className="relative">
+              <div className="relative hidden md:block">
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors"
@@ -128,34 +129,31 @@ const Navbar = () => {
               </div>
             ) : (
               <Link
-  to="/login"
-  className={`px-6 py-2 rounded-lg transition-colors text-center ${
-    isContactPage && !scrolled
-      ? 'bg-white text-blue-600 hover:bg-gray-100'
-      : 'bg-blue-600 text-white hover:bg-blue-700'
-  }`}
->
-  Register
-</Link>
-
+                to="/login"
+                className={`px-6 py-2 rounded-lg transition-colors text-center hidden md:block ${isContactPage && !scrolled
+                    ? 'bg-white text-blue-600 hover:bg-gray-100'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+              >
+                Register
+              </Link>
             )}
-          </div>
 
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              <FaBars className="text-2xl" />
-            </button>
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className={`text-gray-700 hover:text-blue-600 transition-colors ${isContactPage && !scrolled ? 'text-white' : ''}`}
+              >
+                <FaBars className="text-2xl" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white shadow-lg">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="px-4 pt-2 pb-3 space-y-1">
             <Link 
               to="/" 
               className="block px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors"

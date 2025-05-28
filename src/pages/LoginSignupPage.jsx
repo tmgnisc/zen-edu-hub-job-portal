@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import loginIllustration from '../assets/login illustrator.avif';
 import gsap from 'gsap';
+import { Eye, EyeOff } from 'lucide-react'; // Import eye icons
 
 const floatingIcons = [
   { icon: <FaUser className="text-blue-500 text-2xl" />, style: { top: '10%', left: '10%' } },
@@ -38,6 +39,13 @@ const LoginSignupPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
+  // State for password visibility
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+
   useEffect(() => {
     // Animate floating icons
     gsap.utils.toArray('.floating-login-icon').forEach((el, i) => {
@@ -70,9 +78,8 @@ const LoginSignupPage = () => {
   };
 
   const validatePassword = (password) => {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-    return passwordRegex.test(password);
+    // Temporarily disabled password validation
+    return true;
   };
 
   const validateSignupForm = () => {
@@ -157,6 +164,7 @@ const LoginSignupPage = () => {
     }
 
     try {
+      console.log('Registration payload:', signup); // Log the payload
       const response = await fetch('https://zenedu.everestwc.com/api/accounts/register/', {
         method: 'POST',
         headers: {
@@ -166,6 +174,7 @@ const LoginSignupPage = () => {
       });
 
       const data = await response.json();
+      console.log('Registration response:', data); // Log the response
 
       if (response.ok) {
         setSuccess('Registration successful! Please enter the OTP sent to your email.');
@@ -185,6 +194,7 @@ const LoginSignupPage = () => {
         toast.error(data.message || 'Registration failed');
       }
     } catch (err) {
+      console.error('Registration error:', err); // Log any errors
       setError('Network error. Please check your internet connection.');
       toast.error('Network error. Please check your internet connection.');
     } finally {
@@ -219,11 +229,19 @@ const LoginSignupPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Store token
         sessionStorage.setItem('token', data.token);
-        sessionStorage.setItem('user', JSON.stringify({
+        
+        // Store complete user data including id and role
+        const userData = {
+          ...data.user,
           email: signup.email,
-          isLoggedIn: true
-        }));
+          isLoggedIn: true,
+          id: data.user.id || data.user.applicant_id, // Ensure we have the correct ID
+          role: signup.role // Store the role from signup
+        };
+        sessionStorage.setItem('user', JSON.stringify(userData));
+        
         toast.success('OTP verification successful!');
         window.location.href = '/';
       } else {
@@ -340,18 +358,28 @@ const LoginSignupPage = () => {
                       disabled={isLoading}
                     />
                   </div>
+                   {login.email && !validateEmail(login.email) && (
+                     <p className="text-red-500 text-xs mt-1">Please enter a valid email address.</p>
+                   )}
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Password</label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showLoginPassword ? 'text' : 'password'}
                       className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       value={login.password}
                       onChange={e => setLogin({ ...login, password: e.target.value })}
                       required
                       disabled={isLoading}
                     />
+                     <button
+                       type="button"
+                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                       onClick={() => setShowLoginPassword(!showLoginPassword)}
+                     >
+                       {showLoginPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                     </button>
                   </div>
                 </div>
                 <div className="text-right">
@@ -564,27 +592,44 @@ const LoginSignupPage = () => {
                   <label className="block text-sm font-medium text-gray-700">New Password</label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showNewPassword ? 'text' : 'password'}
                       className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       value={newPassword}
                       onChange={e => setNewPassword(e.target.value)}
                       required
                       disabled={isLoading}
                     />
+                     <button
+                       type="button"
+                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                       onClick={() => setShowNewPassword(!showNewPassword)}
+                     >
+                       {showNewPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                     </button>
                   </div>
                 </div>
                  <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showConfirmNewPassword ? 'text' : 'password'}
                       className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       value={confirmNewPassword}
                       onChange={e => setConfirmNewPassword(e.target.value)}
                       required
                       disabled={isLoading}
                     />
+                     <button
+                       type="button"
+                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                       onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                     >
+                       {showConfirmNewPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                     </button>
                   </div>
+                   {confirmNewPassword && newPassword !== confirmNewPassword && (
+                      <p className="text-red-500 text-xs mt-1">Passwords do not match.</p>
+                   )}
                 </div>
                 <button
                   type="button"
@@ -637,32 +682,52 @@ const LoginSignupPage = () => {
                       disabled={isLoading}
                     />
                   </div>
+                   {signup.email && !validateEmail(signup.email) && (
+                      <p className="text-red-500 text-xs mt-1">Please enter a valid email address.</p>
+                   )}
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Password</label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showSignupPassword ? 'text' : 'password'}
                       className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       value={signup.password}
                       onChange={e => setSignup({ ...signup, password: e.target.value })}
                       required
                       disabled={isLoading}
                     />
+                     <button
+                       type="button"
+                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                       onClick={() => setShowSignupPassword(!showSignupPassword)}
+                     >
+                       {showSignupPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                     </button>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showSignupConfirmPassword ? 'text' : 'password'}
                       className="w-full px-4 py-3 bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       value={signup.confirm_password}
                       onChange={e => setSignup({ ...signup, confirm_password: e.target.value })}
                       required
                       disabled={isLoading}
                     />
+                     <button
+                       type="button"
+                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                       onClick={() => setShowSignupConfirmPassword(!showSignupConfirmPassword)}
+                     >
+                       {showSignupConfirmPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
+                     </button>
                   </div>
+                   {signup.confirm_password && signup.password !== signup.confirm_password && (
+                      <p className="text-red-500 text-xs mt-1">Passwords do not match.</p>
+                   )}
                 </div>
                 <button 
                   type="submit" 

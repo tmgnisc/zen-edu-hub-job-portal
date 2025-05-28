@@ -1,10 +1,14 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Phone, Mail, Globe, MapPin, CheckCircle, Users, Briefcase, Award, ChevronRight, Star } from "lucide-react"
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Phone, Mail, Globe, MapPin, CheckCircle, Users, Briefcase, Award, ChevronRight, Star, DollarSign } from "lucide-react"
 import team1 from '../assets/aashish.jpeg'
 import team2 from '../assets/our team 2.jpeg'
 import team3 from '../assets/roshan kc.jpg'
+// Import the getJobs function from your apiService
+import { getJobs } from '../api/apiService';
 
+// Import the new TrendingJobs component
+// import TrendingJobs from '../components/TrendingJobs'; // Removing this import
 
 // Replace Next.js Image with regular img tag
 const Image = ({ src, alt, width, height, className, fill }) => {
@@ -42,7 +46,55 @@ const Button = ({ children, className, variant, ...props }) => {
   );
 };
 
+// Utility function to strip HTML tags from a string (copied from JobsPage.jsx)
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+}
+
+// Define a few background colors to cycle through for visual variety
+const cardBackgroundColors = [
+  'bg-green-100', // Similar to the first card in the image
+  'bg-blue-100',  // Similar to the second and third cards
+  'bg-purple-100',
+  'bg-yellow-100',
+];
+
 export default function HomePage() {
+  // Reinstate state and effect for trending jobs
+  const [trendingJobs, setTrendingJobs] = useState([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
+  const [errorTrending, setErrorTrending] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTrendingJobs = async () => {
+      try {
+        const data = await getJobs();
+        // Filter active jobs and take the first 4
+        const activeJobs = data.filter(job => {
+           const deadlineDate = new Date(job.deadline);
+           const today = new Date();
+           today.setHours(0, 0, 0, 0);
+           return job.is_active && deadlineDate >= today;
+        });
+        setTrendingJobs(activeJobs.slice(0, 3));
+      } catch (err) {
+        setErrorTrending(err.message);
+      } finally {
+        setLoadingTrending(false);
+      }
+    };
+
+    fetchTrendingJobs();
+  }, []);
+
+  const handleJobClick = (jobId) => {
+    navigate(`/jobs/${jobId}`);
+  };
+
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -57,7 +109,7 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
         </div>
-        <div className="container mx-auto px-4 py-12 md:py-12">
+        <div className="container mx-auto px-20 py-16 md:py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
             <div className="space-y-8">
               <div>
@@ -67,7 +119,7 @@ export default function HomePage() {
                 <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mt-4">Bridging Opportunities</h2>
               </div>
               <p className="text-xl text-slate-600 max-w-lg">
-                Z E N Career Hub is a premier human capital solutions provider headquartered in Dubai, connecting
+                ZEN Career Hub is a premier human capital solutions provider headquartered in Dubai, connecting
                 skilled professionals with global opportunities.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -78,41 +130,9 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="flex items-center gap-8 pt-4">
-                <div className="flex -space-x-4">
-                  <Image
-                    src="https://placehold.co/200/2563eb/ffffff?text=C1"
-                    alt="Client"
-                    width={50}
-                    height={50}
-                    className="rounded-full border-2 border-white"
-                  />
-                  <Image
-                    src="https://placehold.co/200/3b82f6/ffffff?text=C2"
-                    alt="Client"
-                    width={50}
-                    height={50}
-                    className="rounded-full border-2 border-white"
-                  />
-                  <Image
-                    src="https://placehold.co/200/60a5fa/ffffff?text=C3"
-                    alt="Client"
-                    width={50}
-                    height={50}
-                    className="rounded-full border-2 border-white"
-                  />
-                  <div className="flex items-center justify-center w-[50px] h-[50px] rounded-full bg-blue-100 text-blue-600 border-2 border-white text-sm font-medium">
-                    +50
-                  </div>
-                </div>
+               
                 <div className="text-slate-700">
-                  <div className="font-semibold">Trusted by 50+ companies</div>
-                  <div className="flex text-yellow-400">
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                    <Star className="h-4 w-4 fill-yellow-400" />
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -134,8 +154,88 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
-      {/* Rest of the sections */}
-      {/* ... existing code ... */}
+      {/* Trending Jobs Section - Moved back to HomePage */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-20">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800">Trending Jobs</h2>
+            <Link to="/jobs" className="text-blue-600 hover:underline flex items-center font-medium">
+              See All Jobs <ChevronRight className="ml-1 w-5 h-5"/>
+            </Link>
+          </div>
+
+          {loadingTrending && <p className="text-center">Loading trending jobs...</p>}
+          {errorTrending && <p className="text-center text-red-500">Error loading trending jobs: {errorTrending}</p>}
+          {!loadingTrending && !errorTrending && trendingJobs.length === 0 && (
+            <p className="text-center text-gray-600 text-lg">No trending jobs available at the moment.</p>
+          )}
+          {!loadingTrending && !errorTrending && trendingJobs.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trendingJobs.map((job, index) => (
+                <div 
+                  key={job.id} 
+                  className={`${cardBackgroundColors[index % cardBackgroundColors.length]} rounded-2xl p-6 relative overflow-hidden cursor-pointer`}
+                  onClick={() => handleJobClick(job.id)}
+                >
+                   {/* Company Logo, Job Title, Company Name */}
+                   <div className="flex justify-between items-start mb-4">
+                     <div>
+                       <h3 className="text-lg font-semibold text-gray-800 mb-1">{job.job_title}</h3>
+                       <p className="text-gray-600 text-sm">{job.company.name}</p>
+                     </div>
+                    {job.company.company_logo && (
+                       <img 
+                         src={job.company.company_logo}
+                         alt={job.company.name}
+                         className="w-16 h-16 object-contain ml-4 rounded-md"
+                       />
+                    )}
+                  </div>
+
+                  {/* Job Description */}
+                  <p className="text-gray-700 text-sm mb-4 leading-relaxed line-clamp-3">{stripHtml(job.job_description)}</p>
+
+                  {/* Location and Type */}
+                  <div className="flex items-center gap-4 mb-6 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4 text-blue-500" />
+                      <span>{job.company.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                       {/* Using Briefcase icon based on API data and previous card design */}
+                      <Briefcase className="w-4 h-4 text-blue-500" />
+                      <span>{job.job_type}</span>
+                    </div>
+                  </div>
+
+                  {/* Salary and Apply Button */}
+                  <div className="flex justify-between items-center mt-4">
+                    <div>
+                       {/* Using DollarSign icon and salary_range from API */}
+                      <span className="text-xl font-bold text-gray-800 flex items-baseline">
+                        {job.salary_range}
+                         <span className="text-gray-600 text-sm ml-1">/mo</span>
+                      </span>
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                         e.stopPropagation(); // Prevent card click from navigating
+                         handleJobClick(job.id);
+                      }}
+                      className="bg-white hover:bg-gray-50 text-gray-800 font-medium py-2 px-6 rounded-md transition-colors duration-200 shadow-sm"
+                    >
+                      Apply Now
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+    
 
       {/* <section className="py-12 bg-white border-y border-slate-100">
         <div className="container mx-auto px-4">
@@ -159,8 +259,8 @@ export default function HomePage() {
       </section> */}
 
       {/* About Section with Stats */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-20">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="absolute top-1/4 -left-5 w-72 h-72 bg-blue-50 rounded-full filter blur-3xl opacity-70 z-0"></div>
@@ -205,7 +305,7 @@ export default function HomePage() {
                 <div className="w-20 h-1 bg-blue-500"></div>
               </div>
               <p className="text-lg text-slate-600">
-                Z E N Career Hub HR Consultancies is a premier human capital solutions provider headquartered in Dubai,
+                ZEN Career Hub HR Consultancies is a premier human capital solutions provider headquartered in Dubai,
                 UAE. Under the visionary leadership of CEO Mr. Aashish Khokhali, we are committed to delivering ethical,
                 efficient, and customized HR solutions.
               </p>
@@ -224,8 +324,8 @@ export default function HomePage() {
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-12 bg-gradient-to-b from-blue-50 to-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-gradient-to-b from-blue-50 to-white">
+        <div className="container mx-auto px-20">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Vision & Mission</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto"></div>
@@ -311,8 +411,8 @@ export default function HomePage() {
       </section>
 
       {/* Services */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-20">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Services</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
@@ -454,10 +554,10 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
+      <section className="py-16 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-10"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-20 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Z E N Career Hub?</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
@@ -529,8 +629,8 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <div className="container mx-auto px-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="md:w-2/3">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Hiring Process?</h2>
@@ -551,8 +651,8 @@ export default function HomePage() {
       </section>
 
       {/* Our Team Section */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Team</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
@@ -567,7 +667,7 @@ export default function HomePage() {
                 <img src={team1} alt="Aashish Khokhali" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Aashish Khokhali</h3>
-             
+              <p className="text-blue-600 font-medium">Group CEO</p>
             </div>
             {/* Team Member 2 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
@@ -575,7 +675,7 @@ export default function HomePage() {
                 <img src={team2} alt="Kiran BK" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Kiran BK</h3>
-             
+              <p className="text-blue-600 font-medium">Managing Partner</p>
             </div>
             {/* Team Member 3 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
@@ -583,7 +683,7 @@ export default function HomePage() {
                 <img src={team3} alt="Roshan KC" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Roshan KC</h3>
-             
+              <p className="text-blue-600 font-medium">Operation Head</p>
             </div>
           </div>
         </div>

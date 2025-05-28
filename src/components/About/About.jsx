@@ -166,7 +166,7 @@ const About = () => {
     <div className="min-h-screen bg-white">
 
       <div ref={heroRef} className="bg-white pt-8">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-20 py-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 hero-animate">
               <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm">ABOUT US</div>
@@ -175,8 +175,7 @@ const About = () => {
               </h1>
               <div className="w-20 h-1 bg-blue-500"></div>
               <p className="text-lg text-gray-600 leading-relaxed">
-                A trusted name in talent solutions, specializing in overseas recruitment, local placements, 
-                HR consulting, and immigration services.
+              Zen Career Hub HR is a Dubai-based company with a regional office in Nepal and a branch in the United Kingdom. We specialize in international recruitment, providing both blue- and white-collar workforce solutions across diverse sectors such as construction, security, cleaning, hospitality, retail (supermarkets), manufacturing, and warehousing. Our talent sourcing network spans Nepal, India, Bangladesh, Philipines and Sri Lanka, catering to the manpower needs of companies across the UAE and GCC
               </p>
               
               <div className="flex flex-wrap gap-4 pt-2">
@@ -209,7 +208,7 @@ const About = () => {
 
       {/* Our Story Section */}
       <div ref={storyRef} className="py-20 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-20">
           <div className="grid md:grid-cols-2 gap-16 items-center md:flex-row-reverse">
             <div className="relative animate-item md:order-1">
               <div className="relative rounded-lg overflow-hidden shadow-lg h-[350px] w-full">
@@ -235,11 +234,7 @@ const About = () => {
                 At ZEN, we don't just fill roles—we build futures.
               </p>
               <div className="pt-4 flex items-center">
-                <div className="flex -space-x-4 mr-6">
-                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs border-2 border-white">15+</div>
-                  <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs border-2 border-white">50+</div>
-                  <div className="w-12 h-12 rounded-full bg-blue-400 flex items-center justify-center text-white text-xs border-2 border-white">500+</div>
-                </div>
+               
               </div>
             </div>
           </div>
@@ -248,7 +243,7 @@ const About = () => {
 
       {/* Core Values Section */}
       <div ref={valuesRef} className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-20">
           <div className="text-center mb-16 animate-item">
             <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-4">OUR PRINCIPLES</div>
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Core Values</h2>
@@ -300,7 +295,7 @@ const About = () => {
 
       {/* Quality Policy Section */}
       <div ref={qualityRef} className="py-20 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-20">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="animate-item">
               <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-2">OUR COMMITMENT</div>
@@ -342,7 +337,7 @@ const About = () => {
 
       {/* Hiring Categories Section - Updated with colorful icons */}
       <div ref={hiringRef} className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-20">
           <div className="text-center mb-16 animate-item">
             <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-2">OUR EXPERTISE</div>
             <h2 className="text-4xl font-bold text-gray-900">Hiring Categories</h2>

@@ -1,28 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { FaSearch, FaBriefcase, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import jobsData from '../utils/jobData.json';
-import figmaLogo from '../assets/figma.png';
-import googleLogo from '../assets/google.png';
-import linkedinLogo from '../assets/linkedin.png';
-import amazonLogo from '../assets/amazon.png';
-import microsoftLogo from '../assets/microsoft.png';
-import twitterLogo from '../assets/twitter.png';
+// Import Lucide Icons
+import { MapPin, Briefcase, DollarSign } from 'lucide-react';
+
 // Import the getJobs function from your apiService
 import { getJobs } from '../api/apiService';
 
-const logoMap = {
-  'figma.png': figmaLogo,
-  'google.png': googleLogo,
-  'linkedin.png': linkedinLogo,
-  'amazon.png': amazonLogo,
-  'microsoft.png': microsoftLogo,
-  'twitter.png': twitterLogo
-};
-
-const getLogo = (logo) => {
-  return logoMap[logo] || '';
-};
+// Define a few background colors to cycle through for visual variety (Copied from HomePage.jsx)
+const cardBackgroundColors = [
+  'bg-green-100', // Similar to the first card in the image
+  'bg-blue-100',  // Similar to the second and third cards
+  'bg-purple-100',
+  'bg-yellow-100',
+];
 
 // Utility function to strip HTML tags from a string
 function stripHtml(html) {
@@ -181,31 +172,45 @@ const JobsPage = () => {
           </div>
         ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {displayedJobs.map((job) => (
+          {displayedJobs.map((job, index) => (
             <div 
               key={job.id} 
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100 cursor-pointer"
+              className={`${cardBackgroundColors[index % cardBackgroundColors.length]} p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-blue-100 cursor-pointer`}
               onClick={() => handleJobClick(job.id)}
             >
-              <div className="flex items-center mb-4">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h4 className="text-xl font-semibold mb-1 text-blue-600">{job.job_title}</h4>
+                  <h5 className="font-semibold text-slate-900 text-sm flex items-center">{job.company.name} {/** Assuming there's a verified status in the API, add a checkmark icon */}{/* {job.company.is_verified && <CheckCircle className="w-4 h-4 ml-1 text-blue-500" />} */}</h5>
+                </div>
                 <img 
                   src={job.company.company_logo} 
                   alt={job.company.name} 
-                  className="h-12 w-12 object-contain mr-4" 
+                  className="h-16 w-16 object-contain ml-4 rounded-md"
                 />
-                <div>
-                  <h5 className="font-semibold">{job.company.name}</h5>
-                  <h6 className="text-gray-600">{job.company.location}</h6>
-                </div>
               </div>
-              <h4 className="text-xl font-semibold mb-3">{job.job_title}</h4>
-              <p className="text-gray-600 mb-4 line-clamp-3">{stripHtml(job.job_description)}</p>
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full">{job.number_of_people} Positions</span>
-                <span className="bg-green-50 text-green-600 px-3 py-1 rounded-full">{job.job_type}</span>
-                <span className="bg-purple-50 text-purple-600 px-3 py-1 rounded-full">{job.salary_range}/Month</span>
-                <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full">Apply before: {new Date(job.deadline).toLocaleDateString()}</span>
+              <p className="text-slate-600 mb-4 line-clamp-3 text-sm">{stripHtml(job.job_description)}</p>
+              <div className="flex flex-wrap gap-3 text-sm text-slate-600 mb-4">
+                <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-blue-500"/>{job.company.location}</span>
+                <span className="flex items-center"><Briefcase className="w-4 h-4 mr-1 text-blue-500"/>{job.job_type}</span>
               </div>
+               <div className="flex justify-between items-center mt-4">
+                 <div>
+                    <span className="text-xl font-bold text-gray-800 flex items-baseline">
+                      {job.salary_range}
+                       <span className="text-gray-600 text-sm ml-1">/mo</span>
+                    </span>
+                 </div>
+                 <button 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     handleJobClick(job.id);
+                   }}
+                   className="bg-white hover:bg-gray-50 text-gray-800 font-medium py-2 px-6 rounded-md transition-colors duration-200 shadow-sm"
+                 >
+                   Apply Now
+                 </button>
+               </div>
             </div>
           ))}
         </div>
