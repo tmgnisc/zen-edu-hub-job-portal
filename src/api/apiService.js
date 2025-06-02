@@ -63,3 +63,39 @@ export const getCategoriesWithCount = async () => {
   const response = await fetch(`${API_BASE_URL}/job-categories/count/`);
   return handleResponse(response);
 };
+
+// Request password reset OTP
+export const requestPasswordReset = async (email) => {
+  const response = await fetch(`${API_BASE_URL}/accounts/password/reset/request/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse(response);
+};
+
+// Verify password reset OTP
+export const verifyPasswordResetOtp = async (email, otp) => {
+  const response = await fetch(`${API_BASE_URL}/accounts/password/reset/verify/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, otp }),
+  });
+  return handleResponse(response);
+};
+
+// Confirm password reset with new password
+export const confirmPasswordReset = async (email, otp, password, confirm_password) => {
+  const response = await fetch(`${API_BASE_URL}/accounts/password/reset/confirm/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, otp, password, confirm_password }),
+  });
+  return handleResponse(response);
+};

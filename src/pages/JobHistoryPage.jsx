@@ -4,6 +4,7 @@ import { FaBriefcase, FaBuilding, FaCalendarAlt, FaMapMarkerAlt, FaCheckCircle, 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getApplicationHistory } from '../api/apiService';
+import Button from '../components/Button';
 
 const JobHistoryPage = () => {
   const navigate = useNavigate();
@@ -81,12 +82,12 @@ const JobHistoryPage = () => {
             <h3 className="mt-4 text-lg font-medium text-gray-900">No applications yet</h3>
             <p className="mt-2 text-gray-500">Start applying for jobs to see your history here.</p>
             <div className="mt-6">
-              <button
+              <Button
                 onClick={() => navigate('/jobs')}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                variant="primary"
               >
                 Browse Jobs
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -125,12 +126,13 @@ const JobHistoryPage = () => {
                         </div>
                       </div>
                     </div>
-                    <button
+                    <Button
                       onClick={() => navigate(`/jobs/${application.job.id}`)}
-                      className="ml-4 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 focus:outline-none focus:underline"
+                      variant="ghost"
+                      className="ml-4 text-sm font-medium"
                     >
                       View Job
-                    </button>
+                    </Button>
                   </div>
                   
                   {application.status === 'pending' && (

@@ -4,6 +4,7 @@ import { Phone, Mail, Globe, MapPin, CheckCircle, Users, Briefcase, Award, Chevr
 import team1 from '../assets/aashish.jpeg'
 import team2 from '../assets/our team 2.jpeg'
 import team3 from '../assets/roshan kc.jpg'
+import team4 from '../assets/teammem.jpeg'
 // Import the getJobs function from your apiService
 import { getJobs } from '../api/apiService';
 
@@ -32,19 +33,7 @@ const Image = ({ src, alt, width, height, className, fill }) => {
   );
 };
 
-// Simple Button component to replace the UI library button
-const Button = ({ children, className, variant, ...props }) => {
-  const baseClasses = "px-4 py-2 rounded-lg transition-colors";
-  const variantClasses = variant === "outline" 
-    ? "border-2 border-blue-600 text-blue-600 hover:bg-blue-50" 
-    : "bg-blue-600  hover:bg-blue-700";
-  
-  return (
-    <button className={`${baseClasses} ${variantClasses} ${className}`} {...props}>
-      {children}
-    </button>
-  );
-};
+import Button from '../components/Button'; // Import the reusable Button component
 
 // Utility function to strip HTML tags from a string (copied from JobsPage.jsx)
 function stripHtml(html) {
@@ -98,35 +87,24 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden mt-8">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-blue-50 opacity-50"></div>
-          <Image
-            src="https://placehold.co/1920x1080/f8fafc/e2e8f0?text="
-            alt="Background Pattern"
-            fill
-            className="object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
-        </div>
-        <div className="container mx-auto px-20 py-16 md:py-20">
+      <section className="relative bg-white overflow-hidden mt-8 py-20">
+       
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20 pt-12 pb-16 md:pt-20 md:pb-20">
           <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
             <div className="space-y-8">
               <div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
+                <h1 className="text-[40px] font-bold text-slate-900 leading-tight hero-animate">
                   Empowering <span className="text-blue-600">Global Talent</span>
                 </h1>
-                <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mt-4">Bridging Opportunities</h2>
+                <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mt-4 hero-animate">Bridging Opportunities</h2>
               </div>
-              <p className="text-xl text-slate-600 max-w-lg">
+              <p className="text-xl text-slate-600 max-w-lg hero-animate">
                 ZEN Career Hub is a premier human capital solutions provider headquartered in Dubai, connecting
                 skilled professionals with global opportunities.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link to="/jobs">
-                  <Button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center">
-                    Explore Jobs
-                  </Button>
+                  <Button to="/jobs" variant="primary">Explore Jobs</Button>
                 </Link>
               </div>
               <div className="flex items-center gap-8 pt-4">
@@ -151,15 +129,15 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+        
       </section>
 
       {/* Trending Jobs Section - Moved back to HomePage */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-20">
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-800">Trending Jobs</h2>
+            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Trending Jobs</h2>
             <Link to="/jobs" className="text-blue-600 hover:underline flex items-center font-medium">
               See All Jobs <ChevronRight className="ml-1 w-5 h-5"/>
             </Link>
@@ -181,9 +159,11 @@ export default function HomePage() {
                    {/* Company Logo, Job Title, Company Name */}
                    <div className="flex justify-between items-start mb-4">
                      <div>
-                       <h3 className="text-lg font-semibold text-gray-800 mb-1">{job.job_title}</h3>
+                       <h3 className="text-xl font-semibold text-gray-800 mb-1">{job.job_title}</h3>
                        <p className="text-gray-600 text-sm">{job.company.name}</p>
                      </div>
+                    {/* Company Logo (Hidden for now) */}
+                    {/*
                     {job.company.company_logo && (
                        <img 
                          src={job.company.company_logo}
@@ -191,6 +171,7 @@ export default function HomePage() {
                          className="w-16 h-16 object-contain ml-4 rounded-md"
                        />
                     )}
+                     */}
                   </div>
 
                   {/* Job Description */}
@@ -205,7 +186,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-1">
                        {/* Using Briefcase icon based on API data and previous card design */}
                       <Briefcase className="w-4 h-4 text-blue-500" />
-                      <span>{job.job_type}</span>
+                      <span>{job.job_type === 'full_time' ? 'Full Time' : job.job_type === 'part_time' ? 'Part Time' : job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</span>
                     </div>
                   </div>
 
@@ -223,9 +204,9 @@ export default function HomePage() {
                          e.stopPropagation(); // Prevent card click from navigating
                          handleJobClick(job.id);
                       }}
-                      className="bg-white hover:bg-gray-50 text-gray-800 font-medium py-2 px-6 rounded-md transition-colors duration-200 shadow-sm"
+                      className="text-gray-800 font-medium transition-colors duration-200"
                     >
-                      Apply Now
+                      See Details
                     </button>
                   </div>
                 </div>
@@ -259,8 +240,8 @@ export default function HomePage() {
       </section> */}
 
       {/* About Section with Stats */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-20">
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="absolute top-1/4 -left-5 w-72 h-72 bg-blue-50 rounded-full filter blur-3xl opacity-70 z-0"></div>
@@ -301,33 +282,31 @@ export default function HomePage() {
             </div>
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Premier HR Consultancy in Dubai</h2>
-                <div className="w-20 h-1 bg-blue-500"></div>
+                <h2 className="text-[40px] font-bold text-slate-900 mb-4 animate-item">Premier HR Consultancy in Dubai</h2>
+                <div className="w-20 h-1 bg-blue-500 animate-item"></div>
               </div>
-              <p className="text-lg text-slate-600">
+              <p className="text-xl text-slate-600 animate-item">
                 ZEN Career Hub HR Consultancies is a premier human capital solutions provider headquartered in Dubai,
                 UAE. Under the visionary leadership of CEO Mr. Aashish Khokhali, we are committed to delivering ethical,
                 efficient, and customized HR solutions.
               </p>
-              <p className="text-lg text-slate-600">
+              <p className="text-xl text-slate-600 animate-item">
                 Our strategic alliance with Zen Edu Hub in Nepal enhances our reach and effectiveness in sourcing
                 top-tier talent from South Asia.
               </p>
-              <Link to="/about">
-                <Button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center mt-8">
-                  Learn More
-                </Button>
-              </Link>
+            
+              
+             
             </div>
           </div>
         </div>
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-16 bg-gradient-to-b from-blue-50 to-white">
-        <div className="container mx-auto px-20">
+      <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Vision & Mission</h2>
+            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Vision & Mission</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto"></div>
           </div>
           <div className="grid md:grid-cols-2 gap-12">
@@ -344,7 +323,7 @@ export default function HomePage() {
                   />
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-slate-900">Our Vision</h3>
-                <p className="text-lg text-slate-600 mb-4">
+                <p className="text-[19px] leading-[19.2px] text-slate-600 mb-4">
                   To be a globally recognized HR consultancy that empowers individuals and organizations through
                   innovative and ethical talent solutions.
                 </p>
@@ -375,21 +354,21 @@ export default function HomePage() {
                 <ul className="space-y-4 text-slate-600 mb-4">
                   <li className="flex items-start">
                     <CheckCircle className="h-6 w-6 text-blue-500 mr-2 flex-shrink-0 mt-1" />
-                    <p className="text-lg">
+                    <p className="text-base leading-relaxed text-gray-900">
                       To provide seamless recruitment and immigration services that facilitate career growth and
                       organizational success.
                     </p>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="h-6 w-6 text-blue-500 mr-2 flex-shrink-0 mt-1" />
-                    <p className="text-lg">
+                    <p className="text-base leading-relaxed text-gray-900">
                       To uphold the highest standards of integrity, transparency, and professionalism in all our
                       engagements.
                     </p>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="h-6 w-6 text-blue-500 mr-2 flex-shrink-0 mt-1" />
-                    <p className="text-lg">
+                    <p className="text-base leading-relaxed text-gray-900">
                       To foster long-term partnerships by understanding and addressing the unique needs of our clients
                       and candidates.
                     </p>
@@ -411,12 +390,12 @@ export default function HomePage() {
       </section>
 
       {/* Services */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-20">
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Services</h2>
+            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Services</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
               We offer comprehensive HR solutions tailored to meet the unique needs of both employers and job seekers.
             </p>
           </div>
@@ -433,11 +412,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Overseas Hiring Solutions</h3>
+                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Overseas Hiring Solutions</h3>
                   <div className="w-12 h-1 bg-blue-500"></div>
                 </div>
               </div>
-              <p className="text-slate-600">
+              <p className="text-base leading-relaxed text-gray-900 mb-8">
                 We connect employers with qualified candidates across various industries, ensuring a perfect fit for
                 roles in the Gulf region and beyond.
               </p>
@@ -454,11 +433,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Local & International Placements</h3>
+                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Local & International Placements</h3>
                   <div className="w-12 h-1 bg-blue-500"></div>
                 </div>
               </div>
-              <p className="text-slate-600">
+              <p className="text-base leading-relaxed text-gray-900 mb-8">
                 Our extensive network enables us to place professionals in positions that align with their skills and
                 career aspirations, both within the UAE and internationally.
               </p>
@@ -467,7 +446,7 @@ export default function HomePage() {
             <div className="group">
               <div className="relative overflow-hidden rounded-2xl mb-6">
                 <Image
-                  src="https://images.unsplash.com/photo-1565688335719-d0297c355556?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fG92ZXJzZWFzJTIwaGlyaW5nfGVufDB8fDB8fHww"
+                  src="https://images.unsplash.com/photo-1565688335719-d0297c355556?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fG92ZXJzZWFzJTIwaGlyaW5nfGVufDB8fDB8fDB"
                   alt="Immigration Services"
                   width={800}
                   height={600}
@@ -475,11 +454,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Immigration Services</h3>
+                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Immigration Services</h3>
                   <div className="w-12 h-1 bg-blue-500"></div>
                 </div>
               </div>
-              <p className="text-slate-600">
+              <p className="text-base leading-relaxed text-gray-900 mb-8">
                 We offer comprehensive immigration support, including visa processing and legal compliance, to
                 facilitate smooth transitions for expatriates.
               </p>
@@ -498,11 +477,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Talent Acquisition & Executive Search</h3>
+                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Talent Acquisition & Executive Search</h3>
                   <div className="w-12 h-1 bg-blue-500"></div>
                 </div>
               </div>
-              <p className="text-slate-600">
+              <p className="text-base leading-relaxed text-gray-900 mb-8">
                 Our dedicated team specializes in sourcing and placing top-tier executives and specialized professionals
                 to drive organizational growth.
               </p>
@@ -519,11 +498,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">HR Consultancy Services</h3>
+                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">HR Consultancy Services</h3>
                   <div className="w-12 h-1 bg-blue-500"></div>
                 </div>
               </div>
-              <p className="text-slate-600">
+              <p className="text-base leading-relaxed text-gray-900 mb-8">
                 We provide strategic HR consulting, including policy development, performance management, and
                 organizational structuring, to optimize workforce efficiency.
               </p>
@@ -540,11 +519,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-white mb-2">Training & Development</h3>
+                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Training & Development</h3>
                   <div className="w-12 h-1 bg-blue-500"></div>
                 </div>
               </div>
-              <p className="text-slate-600">
+              <p className="text-base leading-relaxed text-gray-900 mb-8">
                 Our tailored training programs enhance employee skills and performance, contributing to overall
                 organizational success.
               </p>
@@ -554,12 +533,12 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-slate-900 text-white relative overflow-hidden">
+      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-10"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="container mx-auto px-20 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Choose Z E N Career Hub?</h2>
+            <h2 className="text-[28px] font-medium mb-2 leading-[33.6px]">Why Choose ZEN Career Hub?</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
           </div>
 
@@ -569,7 +548,7 @@ export default function HomePage() {
                 <MapPin className="h-8 w-8 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold mb-4">Strategic Location</h3>
-              <p className="text-slate-300">
+              <p className="text-base leading-relaxed text-slate-300">
                 Situated in Dubai, a global business hub, we are ideally positioned to serve a diverse clientele.
               </p>
             </div>
@@ -579,7 +558,7 @@ export default function HomePage() {
                 <Globe className="h-8 w-8 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold mb-4">Global Network</h3>
-              <p className="text-slate-300">
+              <p className="text-base leading-relaxed text-slate-300">
                 Our partnership with Zen Edu Hub in Nepal and connections across South Asia expand our talent pool.
               </p>
             </div>
@@ -589,7 +568,7 @@ export default function HomePage() {
                 <Briefcase className="h-8 w-8 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold mb-4">Customized Solutions</h3>
-              <p className="text-slate-300">
+              <p className="text-base leading-relaxed text-slate-300">
                 We tailor our services to meet the specific needs of each client, ensuring optimal outcomes.
               </p>
             </div>
@@ -599,7 +578,7 @@ export default function HomePage() {
                 <Award className="h-8 w-8 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold mb-4">Ethical Practices</h3>
-              <p className="text-slate-300">
+              <p className="text-base leading-relaxed text-slate-300">
                 We adhere to the highest ethical standards, ensuring transparency and integrity in all our operations.
               </p>
             </div>
@@ -609,7 +588,7 @@ export default function HomePage() {
                 <Users className="h-8 w-8 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold mb-4">Experienced Leadership</h3>
-              <p className="text-slate-300">
+              <p className="text-base leading-relaxed text-slate-300">
                 Our leadership team brings a wealth of experience and insight into the HR and recruitment industry.
               </p>
             </div>
@@ -619,7 +598,7 @@ export default function HomePage() {
                 <CheckCircle className="h-8 w-8 text-blue-400" />
               </div>
               <h3 className="text-xl font-bold mb-4">Proven Results</h3>
-              <p className="text-slate-300">
+              <p className="text-base leading-relaxed text-slate-300">
                 Our track record of successful placements and satisfied clients speaks to our effectiveness and
                 reliability.
               </p>
@@ -629,21 +608,19 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-        <div className="container mx-auto px-20">
+      <section className="py-20 bg-[#283588] text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="md:w-2/3">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Hiring Process?</h2>
-              <p className="text-xl text-blue-100">
-                Partner with Z E N Career Hub for all your recruitment and HR needs. Let us help you find the perfect
+              <h2 className="text-[28px] font-medium mb-2 leading-[33.6px]">Ready to Transform Your Hiring Process?</h2>
+              <p className="text-base leading-relaxed text-blue-100 mb-10">
+                Partner with ZEN Career Hub for all your recruitment and HR needs. Let us help you find the perfect
                 talent for your organization.
               </p>
             </div>
             <div className="md:w-1/3 flex justify-center md:justify-end">
               <Link to="/contact">
-                <Button className="bg-white text-blue-600 border-2 border-blue-600 px-6 py-2 rounded-lg hover:bg-white hover:text-blue-600 transition-colors text-center">
-                  Contact Us
-                </Button>
+                <Button to="/contact" variant="secondary">Contact Us</Button>
               </Link>
             </div>
           </div>
@@ -651,39 +628,54 @@ export default function HomePage() {
       </section>
 
       {/* Our Team Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-20">
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Team</h2>
+            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Team</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
               Meet the dedicated professionals behind Z E N Career Hub.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             {/* Team Member 1 */}
+            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
+                <img src={team4} alt="Binod Timalsina" className="w-full h-full object-cover" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">Binod Timalsina</h3>
+              <p className="text-blue-600 font-medium">Chairman</p>
+              <p className="text-sm text-gray-600 mt-2">Sukilo General Trading LLC / Sukilo Properties / Zen Career Hub HR</p>
+            </div>
+
+            {/* Team Member 2 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
                 <img src={team1} alt="Aashish Khokhali" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Aashish Khokhali</h3>
-              <p className="text-blue-600 font-medium">Group CEO</p>
+              <p className="text-blue-600 font-medium">CEO</p>
+              <p className="text-sm text-gray-600 mt-2">Zen Edu and Career Hub Pvt Ltd / Zen Career Hub HR Consultancy LLC</p>
             </div>
-            {/* Team Member 2 */}
+
+            {/* Team Member 3 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
                 <img src={team2} alt="Kiran BK" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Kiran BK</h3>
               <p className="text-blue-600 font-medium">Managing Partner</p>
+              <p className="text-sm text-gray-600 mt-2">Zen Career Hub HR Consultancy LLC</p>
             </div>
-            {/* Team Member 3 */}
+
+            {/* Team Member 4 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
                 <img src={team3} alt="Roshan KC" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">Roshan KC</h3>
               <p className="text-blue-600 font-medium">Operation Head</p>
+              <p className="text-sm text-gray-600 mt-2">Zen Career Hub HR Consultancy LLC</p>
             </div>
           </div>
         </div>

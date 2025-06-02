@@ -195,6 +195,7 @@ const ProfilePage = () => {
     form.append('preferred_job_location', formData.preferred_job_location);
     form.append('highest_qualification', formData.highest_qualification);
     form.append('years_of_experience', formData.years_of_experience);
+    form.append('email', formData.email);
   
     if (profileImageFile) {
       form.append('profile_picture', profileImageFile);
@@ -213,7 +214,17 @@ const ProfilePage = () => {
         body: form
       });
   
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response, likely HTML error page.', jsonError);
+        const textResponse = await response.text();
+        console.error('Raw response text:', textResponse);
+        toast.error('Server returned an unexpected response.');
+        setLoading(false);
+        return;
+      }
       
       if (response.ok) {
         await new Promise(resolve => setTimeout(resolve, 1000));

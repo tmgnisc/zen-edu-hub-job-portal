@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaBriefcase, FaBuilding, FaMapMarkerAlt, FaMoneyBillWave } from 'react-icons/fa';
+
 import { useNavigate } from 'react-router-dom';
 // Import Lucide Icons
-import { MapPin, Briefcase, DollarSign } from 'lucide-react';
+import { MapPin, Briefcase } from 'lucide-react';
+import Button from '../components/Button';
 
 // Import the getJobs function from your apiService
 import { getJobs } from '../api/apiService';
@@ -183,16 +184,19 @@ const JobsPage = () => {
                   <h4 className="text-xl font-semibold mb-1 text-blue-600">{job.job_title}</h4>
                   <h5 className="font-semibold text-slate-900 text-sm flex items-center">{job.company.name} {/** Assuming there's a verified status in the API, add a checkmark icon */}{/* {job.company.is_verified && <CheckCircle className="w-4 h-4 ml-1 text-blue-500" />} */}</h5>
                 </div>
+                {/* Company Logo (Hidden for now) */}
+                {/* 
                 <img 
                   src={job.company.company_logo} 
                   alt={job.company.name} 
                   className="h-16 w-16 object-contain ml-4 rounded-md"
                 />
+                 */}
               </div>
               <p className="text-slate-600 mb-4 line-clamp-3 text-sm">{stripHtml(job.job_description)}</p>
               <div className="flex flex-wrap gap-3 text-sm text-slate-600 mb-4">
                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-blue-500"/>{job.company.location}</span>
-                <span className="flex items-center"><Briefcase className="w-4 h-4 mr-1 text-blue-500"/>{job.job_type}</span>
+                <span className="flex items-center"><Briefcase className="w-4 h-4 mr-1 text-blue-500"/>{job.job_type === 'full_time' ? 'Full Time' : job.job_type === 'part_time' ? 'Part Time' : job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</span>
               </div>
                <div className="flex justify-between items-center mt-4">
                  <div>
@@ -201,15 +205,16 @@ const JobsPage = () => {
                        <span className="text-gray-600 text-sm ml-1">/mo</span>
                     </span>
                  </div>
-                 <button 
+                 <Button
                    onClick={(e) => {
-                     e.stopPropagation();
-                     handleJobClick(job.id);
+                      e.stopPropagation();
+                      handleJobClick(job.id);
                    }}
-                   className="bg-white hover:bg-gray-50 text-gray-800 font-medium py-2 px-6 rounded-md transition-colors duration-200 shadow-sm"
+                   variant="secondary"
+                   className="transition-colors duration-200 shadow-sm"
                  >
                    Apply Now
-                 </button>
+                 </Button>
                </div>
             </div>
           ))}

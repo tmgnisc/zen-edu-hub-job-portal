@@ -41,9 +41,9 @@ const ChangePasswordPage = () => {
           'Authorization': `Token ${token}`,
         },
         body: JSON.stringify({
-          old_password: oldPassword,
-          new_password: newPassword,
-          confirm_new_password: confirmNewPassword,
+          email: JSON.parse(sessionStorage.getItem('user'))?.email,
+          password: newPassword,
+          confirm_password: confirmNewPassword,
         }),
       });
 

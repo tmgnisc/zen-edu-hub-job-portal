@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SendIcon } from 'lucide-react';
 
-const ContactForm = () => {
+const ContactForm = ({ ButtonComponent }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -165,12 +165,11 @@ const ContactForm = () => {
         />
       </div>
       
-      <button
+      <ButtonComponent
         type="submit"
         disabled={isSubmitting}
-        className={`w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg 
-          ${isSubmitting ? 'opacity-75 cursor-not-allowed' : 'hover:bg-blue-700'} 
-          transition-all duration-200 transform hover:translate-y-[-2px] active:translate-y-[0px]`}
+        variant="primary"
+        className="w-full flex items-center justify-center gap-2"
       >
         {isSubmitting ? (
           <>
@@ -185,7 +184,7 @@ const ContactForm = () => {
             Send Message <SendIcon size={18} />
           </>
         )}
-      </button>
+      </ButtonComponent>
     </form>
   );
 };

@@ -8,7 +8,6 @@ import Jobs from './components/Jobs/Jobs';
 import Footer from './components/Footer/Footer';
 import WhatWeOffer from './components/Footer/WhatWeOffer';
 import JobsPage from './pages/JobsPage';
-import LoginSignupPage from './pages/LoginSignupPage';
 import JobDetailsPage from './pages/JobDetailsPage';
 import About from './components/About/About';
 import ProfilePage from './pages/ProfilePage';
@@ -19,6 +18,9 @@ import HomePage from './pages/HomePage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ContactPage from './pages/ContactPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 function Home() {
   return (
@@ -38,7 +40,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/jobs/:id" element={<JobDetailsPage />} />
-            <Route path="/login" element={<LoginSignupPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route 

@@ -5,11 +5,11 @@ import zenLogo from '../../assets/Zen Logo Main Blue 0.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-blue-600 text-white py-6">
+    <footer className="bg-[#283588] text-white py-6">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            <p className="text-white">
+            <p className="text-white leading-6">
               © {new Date().getFullYear()} Zen Career Hub. All rights reserved.
             </p>
           </div>
