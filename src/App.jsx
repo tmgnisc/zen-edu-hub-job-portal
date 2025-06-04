@@ -4,7 +4,6 @@ import Navbar from './components/Navbar/Navbar';
 import Header from './components/Header/Header';
 import Steps from './components/Steps/Steps';
 import Explore from './components/Explore/Explore';
-import Jobs from './components/Jobs/Jobs';
 import Footer from './components/Footer/Footer';
 import WhatWeOffer from './components/Footer/WhatWeOffer';
 import JobsPage from './pages/JobsPage';
@@ -21,6 +20,7 @@ import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function Home() {
   return (
@@ -66,6 +66,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
         <Footer />

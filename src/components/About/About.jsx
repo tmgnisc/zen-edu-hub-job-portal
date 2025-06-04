@@ -164,9 +164,9 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-white">
-
-      <div ref={heroRef} className="bg-white py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-12">
+      {/* Hero Section */}
+      <div ref={heroRef} className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 hero-animate">
               <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm">ABOUT US</div>
@@ -175,7 +175,7 @@ const About = () => {
               </h1>
               <div className="w-20 h-1 bg-blue-500"></div>
               <p className="text-[20px] text-gray-600 leading-relaxed">
-              Zen Career Hub HR is a Dubai-based company with a regional office in Nepal and a branch in the United Kingdom. We specialize in international recruitment, providing both blue- and white-collar workforce solutions across diverse sectors such as construction, security, cleaning, hospitality, retail (supermarkets), manufacturing, and warehousing. Our talent sourcing network spans Nepal, India, Bangladesh, Philipines and Sri Lanka, catering to the manpower needs of companies across the UAE and GCC
+                Zen Career Hub HR is a Dubai-based company with a regional office in Nepal and a branch in the United Kingdom. We specialize in international recruitment, providing both blue- and white-collar workforce solutions across diverse sectors such as construction, security, cleaning, hospitality, retail (supermarkets), manufacturing, and warehousing. Our talent sourcing network spans Nepal, India, Bangladesh, Philipines and Sri Lanka, catering to the manpower needs of companies across the UAE and GCC
               </p>
               
               <div className="flex flex-wrap gap-4 pt-2">
@@ -209,8 +209,8 @@ const About = () => {
       {/* Our Story Section */}
       <div ref={storyRef} className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="grid md:grid-cols-2 gap-16 items-center md:flex-row-reverse">
-            <div className="relative animate-item md:order-1">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative animate-item">
               <div className="relative rounded-lg overflow-hidden shadow-lg h-[350px] w-full">
                 <img
                   src={aboutImage2}
@@ -220,22 +220,19 @@ const About = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-blue-900/20 to-transparent"></div>
               </div>
             </div>
-            <div className="space-y-6 animate-item md:order-2">
-              <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-2">OUR STORY</div>
-              <h2 className="text-[28px] font-medium text-gray-900 leading-[33.6px] mb-2">Building bridges between <span className="text-blue-600">talent and opportunity</span></h2>
+            <div className="space-y-6 animate-item">
+              <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm">OUR STORY</div>
+              <h2 className="text-[28px] font-medium text-gray-900 leading-[33.6px]">Building bridges between <span className="text-blue-600">talent and opportunity</span></h2>
               <div className="w-20 h-1 bg-blue-500"></div>
-              <p className="text-[19px] leading-[19.2px] text-gray-900 mb-10">
+              <p className="text-[19px] leading-[19.2px] text-gray-900">
                 With our office in Dubai, we connect skilled professionals with global opportunities 
                 and help businesses build high-performing teams.
               </p>
-              <p className="text-[19px] leading-[19.2px] text-gray-900 mb-10">
+              <p className="text-[19px] leading-[19.2px] text-gray-900">
                 Rooted in integrity and driven by results, we offer end-to-end workforce solutions tailored 
                 to your needs—whether you're a company seeking top talent or an individual pursuing a career abroad. 
                 At ZEN, we don't just fill roles—we build futures.
               </p>
-              <div className="pt-4 flex items-center">
-               
-              </div>
             </div>
           </div>
         </div>
@@ -244,11 +241,11 @@ const About = () => {
       {/* Core Values Section */}
       <div ref={valuesRef} className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="text-center mb-16 animate-item">
+          <div className="text-center mb-12 animate-item">
             <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-4">OUR PRINCIPLES</div>
-            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Core Values</h2>
-            <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
-            <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
+            <h2 className="text-[28px] font-medium text-gray-900 leading-[33.6px]">Core Values</h2>
+            <div className="w-20 h-1 bg-blue-500 mx-auto mt-4"></div>
+            <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mt-6">
               Our core values define who we are and guide how we conduct business. They are the foundation of our company culture and shape our interactions with clients, candidates, and each other.
             </p>
           </div>
@@ -269,7 +266,7 @@ const About = () => {
             ))}
           </div>
           
-          <div className="mt-16 bg-blue-600 rounded-3xl overflow-hidden animate-item">
+          <div className="mt-12 bg-blue-600 rounded-3xl overflow-hidden animate-item">
             <div className="grid md:grid-cols-2">
               <div className="p-10 md:p-12 flex flex-col justify-center">
                 <FaQuoteLeft className="text-4xl text-blue-400 mb-6" />
@@ -296,13 +293,13 @@ const About = () => {
       {/* Quality Policy Section */}
       <div ref={qualityRef} className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="animate-item">
-              <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-2">OUR COMMITMENT</div>
-              <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Quality Policy</h2>
-              <div className="w-20 h-1 bg-blue-500 mb-8"></div>
+              <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-4">OUR COMMITMENT</div>
+              <h2 className="text-[28px] font-medium text-gray-900 leading-[33.6px]">Quality Policy</h2>
+              <div className="w-20 h-1 bg-blue-500 mt-4"></div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
                 {qualityPolicies.map((policy, index) => (
                   <div key={index} className="flex items-start">
                     <div className="mt-1 mr-3 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -313,7 +310,7 @@ const About = () => {
                 ))}
               </div>
               
-              <div className="mt-10 p-6 bg-blue-50 rounded-2xl border-l-4 border-blue-500">
+              <div className="mt-8 p-6 bg-blue-50 rounded-2xl border-l-4 border-blue-500">
                 <p className="text-lg text-gray-800">
                   At ZEN Career Hub HR Consultancies, we are dedicated to bridging the gap between talent and opportunity, fostering growth for individuals and organizations alike.
                 </p>
@@ -335,14 +332,14 @@ const About = () => {
         </div>
       </div>
 
-      {/* Hiring Categories Section - Updated with colorful icons */}
+      {/* Hiring Categories Section */}
       <div ref={hiringRef} className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
-          <div className="text-center mb-16 animate-item">
-            <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-2">OUR EXPERTISE</div>
-            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Hiring Categories</h2>
+          <div className="text-center mb-12 animate-item">
+            <div className="inline-block rounded-full bg-blue-100 px-4 py-1 text-blue-600 font-medium text-sm mb-4">OUR EXPERTISE</div>
+            <h2 className="text-[28px] font-medium text-gray-900 leading-[33.6px]">Hiring Categories</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mt-4"></div>
-            <p className="mt-6 text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
+            <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mt-6">
               We specialize in recruiting top talent across a diverse range of industries, connecting skilled professionals with opportunities worldwide.
             </p>
           </div>
@@ -360,7 +357,7 @@ const About = () => {
             ))}
           </div>
           
-          <div className="mt-16 bg-blue-50 rounded-3xl p-8 md:p-12 animate-item">
+          <div className="mt-12 bg-blue-50 rounded-3xl p-8 md:p-12 animate-item">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Looking for specialized talent?</h3>

@@ -54,10 +54,10 @@ const Navbar = () => {
   };
 
   return (
-<nav className={`${scrolled ? 'bg-white shadow-md' : 'bg-transparent shadow-none'} fixed w-full z-50 transition-all duration-300`}>
+<nav className={`${scrolled ? 'bg-white shadow-md' : 'bg-transparent shadow-none'} fixed w-full z-[1000] transition-all duration-300`}>
 
       <div className="container mx-auto">
-        <div className="flex justify-between h-20 items-center px-4 md:px-20">
+        <div className="flex justify-between h-20 items-center px-4 sm:px-6 lg:px-20">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
               <img

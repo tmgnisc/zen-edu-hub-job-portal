@@ -6,7 +6,8 @@ import team2 from '../assets/our team 2.jpeg'
 import team3 from '../assets/roshan kc.jpg'
 import team4 from '../assets/teammem.jpeg'
 // Import the getJobs function from your apiService
-import { getJobs } from '../api/apiService';
+import { getJobs, getCategoriesWithCount } from '../api/apiService';
+import GoogleMap from '../components/GoogleMap'; // Import GoogleMap
 
 // Import the new TrendingJobs component
 // import TrendingJobs from '../components/TrendingJobs'; // Removing this import
@@ -55,6 +56,10 @@ export default function HomePage() {
   const [trendingJobs, setTrendingJobs] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(true);
   const [errorTrending, setErrorTrending] = useState(null);
+  // State for job categories
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,6 +84,23 @@ export default function HomePage() {
     fetchTrendingJobs();
   }, []);
 
+  // Effect to fetch job categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategoriesWithCount();
+        // Filter categories with job_count > 0 if needed, or display all
+        setCategories(data.filter(category => category.job_count > 0)); // Example: only show categories with jobs
+      } catch (err) {
+        setErrorCategories(err.message);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const handleJobClick = (jobId) => {
     navigate(`/jobs/${jobId}`);
   };
@@ -87,11 +109,10 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden mt-8 py-20">
-       
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20 pt-12 pb-16 md:pt-20 md:pb-20">
-          <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
-            <div className="space-y-8">
+      <section className="relative bg-white overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20 pt-16 md:pt-20 pb-12 md:pb-16">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center relative z-10">
+            <div className="space-y-6 md:space-y-8">
               <div>
                 <h1 className="text-[40px] font-bold text-slate-900 leading-tight hero-animate">
                   Empowering <span className="text-blue-600">Global Talent</span>
@@ -129,11 +150,10 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        
       </section>
 
-      {/* Trending Jobs Section - Moved back to HomePage */}
-      <section className="py-20 bg-white">
+      {/* Trending Jobs Section */}
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
@@ -149,7 +169,7 @@ export default function HomePage() {
             <p className="text-center text-gray-600 text-lg">No trending jobs available at the moment.</p>
           )}
           {!loadingTrending && !errorTrending && trendingJobs.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {trendingJobs.map((job, index) => (
                 <div 
                   key={job.id} 
@@ -386,6 +406,35 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Job Categories Section - Added */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+          <div className="text-center mb-12">
+            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Job Categories</h2>
+            <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
+            <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
+              Explore job opportunities by category.
+            </p>
+          </div>
+
+          {loadingCategories && <p className="text-center">Loading categories...</p>}
+          {errorCategories && <p className="text-center text-red-500">Error loading categories: {errorCategories}</p>}
+          {!loadingCategories && !errorCategories && categories.length === 0 && (
+            <p className="text-center text-gray-600 text-lg">No job categories available at the moment with active jobs.</p>
+          )}
+          {!loadingCategories && !errorCategories && categories.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {categories.map(category => (
+                <div key={category.id} className="bg-blue-50 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                  <h3 className="text-xl font-semibold text-blue-700 mb-2">{category.name}</h3>
+                  <p className="text-gray-600">{category.job_count} Jobs Available</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -634,7 +683,7 @@ export default function HomePage() {
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Team</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
             <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
-              Meet the dedicated professionals behind Z E N Career Hub.
+              Meet the dedicated professionals behind ZEN Career Hub.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
@@ -676,6 +725,63 @@ export default function HomePage() {
               <h3 className="text-xl font-bold text-slate-900 mb-1">Roshan KC</h3>
               <p className="text-blue-600 font-medium">Operation Head</p>
               <p className="text-sm text-gray-600 mt-2">Zen Career Hub HR Consultancy LLC</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact and Map Section - Added */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            {/* Map Column */}
+            <div>
+              <GoogleMap />
+            </div>
+
+            {/* Contact Info Column */}
+            <div className="space-y-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">We'd Love to Hear From You!</h2>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Whether you have a question about our services, need assistance, or just want to talk, we're here for you.
+              </p>
+              
+              <div className="space-y-4">
+                {/* Email */}
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Mail className="text-blue-600 h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Email Address</h4>
+                    <a href="mailto:info@zencareerhub.ae" className="text-blue-600 hover:underline">info@zencareerhub.ae</a>
+                  </div>
+                </div>
+                {/* Phone */}
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Phone className="text-blue-600 h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Phone Number</h4>
+                    <a href="tel:+971566214420" className="text-blue-600 hover:underline">+971 56 621 4420</a>
+                  </div>
+                </div>
+                {/* Address */}
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <MapPin className="text-blue-600 h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Office Address</h4>
+                    <p className="text-gray-700 leading-relaxed">
+                       Office 402, Sultan Group Investments Building<br />
+                       Al Ittihad Road, Opposite The Emirates Group<br />
+                       Al Khabaisi, Dubai, UAE
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

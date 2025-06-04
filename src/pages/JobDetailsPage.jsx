@@ -243,7 +243,7 @@ export default function JobDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 pt-24">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 pt-32">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 font-medium">Loading job details...</p>
@@ -254,7 +254,7 @@ export default function JobDetailsPage() {
 
   if (error || !job) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-pink-100 pt-24">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-pink-100 pt-32">
         <Card className="max-w-md w-full mx-4">
           <CardContent className="text-center p-8">
             <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
@@ -268,12 +268,12 @@ export default function JobDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-20">
       <ToastContainer position="top-right" autoClose={3000} />
 
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-6">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="flex-shrink-0">
               <img
@@ -283,7 +283,7 @@ export default function JobDetailsPage() {
               />
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.job_title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2 text-left">{job.job_title}</h1>
               <div className="flex flex-wrap items-center gap-4 text-gray-600">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-blue-600" />
@@ -323,7 +323,7 @@ export default function JobDetailsPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
