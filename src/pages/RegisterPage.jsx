@@ -71,7 +71,12 @@ const RegisterPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(signup)
+        body: JSON.stringify({
+          email: signup.email,
+          username: signup.username,
+          password: signup.password,
+          confirm_password: signup.confirm_password
+        })
       });
 
       const data = await response.json();

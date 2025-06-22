@@ -21,11 +21,15 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import NotFoundPage from './pages/NotFoundPage';
+import LandingPage from './pages/LandingPage';
+import ClientsPage from './pages/ClientsPage';
+import TeamPage from './pages/TeamPage';
+import ScrollToTop from './components/ScrollToTop';
 
 function Home() {
   return (
     <>
-      <HomePage/>
+      <LandingPage/>
     </>
   );
 }
@@ -33,6 +37,7 @@ function Home() {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="flex flex-col min-h-screen">
         <Navbar />
         <main className="flex-grow">
@@ -66,6 +71,8 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/team" element={<TeamPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>

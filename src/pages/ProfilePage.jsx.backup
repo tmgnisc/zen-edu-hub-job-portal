@@ -46,7 +46,6 @@ const ProfilePage = () => {
     preferred_designation: '',
     past_employment_details: '',
     availability_to_join: '',
-    linkedin_url: '',
   });
 
   // Fetch profile data from API
@@ -96,7 +95,6 @@ const ProfilePage = () => {
         driving_license: '', languages: '', visa_status: '', passport_expiry_date: '',
         education_details: '', preferred_designation: '', past_employment_details: '',
         availability_to_join: '',
-        linkedin_url: '',
         ...user // Spread user data to override defaults
       };
       setFormData(allFields);
@@ -193,7 +191,7 @@ const ProfilePage = () => {
     e.preventDefault();
     const token = sessionStorage.getItem('token');
     if (!token) return;
-  
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
@@ -201,82 +199,24 @@ const ProfilePage = () => {
   
     setLoading(true);
     setFormErrors({});
-    
-    // Debug: Log current form data structure
-    console.log('Current form data:', formData);
   
     const form = new FormData();
-    
-    // Only append fields that have values and are not null/undefined
+    // Append all form fields
     Object.keys(formData).forEach(key => {
-      let value = formData[key];
+      // Ensure we don't send null values, replace with empty string
+      let value = formData[key] === null ? '' : formData[key];
       
-      // Skip null, undefined, or empty string values for most fields
-      if (value === null || value === undefined || value === '') {
-        return; // Skip this field entirely
+      // Handle special cases based on Postman request
+      if (key === 'visa_status') {
+        // Send as empty array if empty, otherwise as string
+        value = value === '' ? '[]' : value;
       }
       
-      // Skip fields that might not be expected by the API
-      if (key === 'id' || key === 'user' || key === 'created_at' || key === 'updated_at') {
-        return; // Skip these fields as they're managed by the server
-      }
-      
-      // Handle passport_expiry_date: Only append if it's a valid date
-      if (key === 'passport_expiry_date') {
-        if (value && value !== '') {
-          form.append(key, value);
-        }
-      } else if (key === 'years_of_experience') {
-        // Handle years of experience - ensure it's a valid selection
-        if (value && value !== '' && experienceLevels.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'gender') {
-        // Handle gender - ensure it's a valid selection
-        if (value && value !== '' && genderOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'marital_status') {
-        // Handle marital status - ensure it's a valid selection
-        if (value && value !== '' && maritalStatusOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'currency') {
-        // Handle currency - ensure it's a valid selection
-        if (value && value !== '' && currencyOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'availability_to_join') {
-        // Handle availability - ensure it's a valid selection
-        if (value && value !== '' && availabilityOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'driving_license') {
-        // Handle driving license - ensure it's a valid selection
-        if (value && value !== '' && drivingLicenseOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'highest_qualification') {
-        // Handle highest qualification - ensure it's a valid selection
-        if (value && value !== '' && highestQualificationOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key === 'visa_status') {
-        // Handle visa status - ensure it's a valid selection
-        if (value && value !== '' && visaStatusOptions.includes(value)) {
-          form.append(key, value);
-        }
-      } else if (key !== 'profile_picture' && key !== 'resume') {
-        // For all other text fields, only append if they have content
-        if (value && value.toString().trim() !== '') {
-          // Ensure we're sending a string, not an object or array
-          const stringValue = typeof value === 'object' ? JSON.stringify(value) : value.toString().trim();
-          form.append(key, stringValue);
-        }
+      if (key !== 'profile_picture' && key !== 'resume') {
+        form.append(key, value);
       }
     });
-  
-    // Handle file uploads
+
     if (profileImageFile) {
       form.append('profile_picture', profileImageFile);
     }
@@ -284,53 +224,14 @@ const ProfilePage = () => {
     if (resumeFile) {
       form.append('resume', resumeFile);
     }
-  
+
     // Debug: Log what we're sending
     console.log('Form data being sent:');
-    const formEntries = Array.from(form.entries());
-    formEntries.forEach(([key, value]) => {
+    for (let [key, value] of form.entries()) {
       console.log(`${key}: ${value}`);
-    });
-    
-    // Debug: Log the current form data structure
-    console.log('Current formData object:', formData);
-    
-    // Additional validation: Check if we have any data to send
-    if (formEntries.length === 0) {
-      toast.error('No data to update. Please fill in at least one field.');
-      setLoading(false);
-      return;
     }
-    
-    // Debug: Log the token to ensure it's valid
-    console.log('Token being used:', token ? `${token.substring(0, 20)}...` : 'No token');
-    
-    // Check if token exists
-    if (!token) {
-      toast.error('No authentication token found. Please login again.');
-      navigate('/login');
-      return;
-    }
-    
+  
     try {
-      // First, test if the endpoint is accessible
-      console.log('Testing API endpoint accessibility...');
-      const testResponse = await fetch('https://zenedu.everestwc.com/api/accounts/profile/', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Token ${token}`,
-        }
-      });
-      
-      console.log('Test response status:', testResponse.status);
-      
-      if (testResponse.status === 401) {
-        toast.error('Authentication failed. Please login again.');
-        navigate('/login');
-        return;
-      }
-      
-      // Now make the actual PATCH request
       const response = await fetch('https://zenedu.everestwc.com/api/accounts/profile/', {
         method: 'PATCH',
         headers: {
@@ -339,44 +240,24 @@ const ProfilePage = () => {
         body: form
       });
   
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-  
       let data;
-      let textResponse = '';
-      
-      // Check if response is JSON or HTML
-      const contentType = response.headers.get('content-type');
-      console.log('Content-Type:', contentType);
-      
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          data = await response.json();
-          console.log('Server response:', data);
-        } catch (jsonError) {
-          console.error('Failed to parse JSON response:', jsonError);
-          setLoading(false);
-          return;
-        }
-      } else {
-        // Response is HTML (likely error page)
-        textResponse = await response.text();
+      try {
+        data = await response.json();
+        // Debug: Log the response
+        console.log('Server response:', data);
+        console.log('Response status:', response.status);
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response, likely HTML error page.', jsonError);
+        const textResponse = await response.text();
         console.error('Raw response text:', textResponse);
-        console.error('HTML Error Response (first 1000 chars):', textResponse.substring(0, 1000));
-        
-        // Try to extract more information from the error response
-        if (textResponse.includes('500') || textResponse.includes('Internal Server Error')) {
-          toast.error('Server error (500). Please check the console for details and try again later.');
-        } else {
-          toast.error('Server returned an unexpected response. Please try again.');
-        }
+        toast.error('Server returned an unexpected response.');
         setLoading(false);
         return;
       }
-  
+      
       if (response.ok) {
         await new Promise(resolve => setTimeout(resolve, 1000));
-  
+        
         // Update the user data in sessionStorage
         const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
         const updatedUser = {
@@ -385,23 +266,22 @@ const ProfilePage = () => {
           profile_picture: data.profile_picture || currentUser.profile_picture
         };
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
-  
+        
         // Dispatch profile update event
         window.dispatchEvent(new Event('profileUpdated'));
-  
+        
         toast.success('Profile updated successfully');
         setIsEditing(false);
         fetchProfile();
       } else {
-        console.error('Profile update failed with status:', response.status);
-        console.error('Error response:', data);
-        
+        // Handle different types of errors
         if (response.status === 400) {
+          // Handle validation errors
           if (data.errors) {
             const errors = {};
             Object.keys(data.errors).forEach(key => {
-              errors[key] = Array.isArray(data.errors[key])
-                ? data.errors[key][0]
+              errors[key] = Array.isArray(data.errors[key]) 
+                ? data.errors[key][0] 
                 : data.errors[key];
             });
             setFormErrors(errors);
@@ -417,20 +297,17 @@ const ProfilePage = () => {
         } else if (response.status === 415) {
           toast.error('Invalid file type. Please upload supported file formats.');
         } else if (response.status >= 500) {
-          console.error('Server error details:', data);
-          toast.error(`Server error (${response.status}). Please try again later.`);
+          toast.error('Server error. Please try again later.');
         } else {
-          toast.error(data.message || `Failed to update profile (${response.status})`);
+          toast.error(data.message || 'Failed to update profile');
         }
       }
     } catch (err) {
       console.error('Update error:', err);
-      console.error('Error stack:', err.stack);
-      
       if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
         toast.error('Network error. Please check your internet connection.');
       } else {
-        toast.error(`An unexpected error occurred: ${err.message}`);
+        toast.error('An unexpected error occurred. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -459,77 +336,9 @@ const ProfilePage = () => {
   ];
 
   const genderOptions = ['male', 'female', 'other'];
-  const maritalStatusOptions = ['married', 'unmarried'];
-  const currencyOptions = ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'CAD', 'JPY', 'CNY', 'AED', 'SAR'];
-  const availabilityOptions = ['immediate', '1_week', '2_weeks', '1_month', '2_months', '3_months'];
-  const drivingLicenseOptions = ['two_wheel', 'four_wheel', 'other', 'none'];
-  const highestQualificationOptions = ['high_school', 'diploma', 'associate', 'bachelor', 'master', 'doctorate', 'professional_certification'];
-  const visaStatusOptions = ['tourist_visa', 'student_visa', 'work_visa', 'business_visa', 'permanent_resident', 'spouse_dependent_visa', 'transit_visa', 'refugee_asylum_visa', 'diplomatic_visa', 'investor_visa', 'na'];
-  
-  // Custom labels for better user experience
-  const availabilityLabels = {
-    'immediate': 'Immediate',
-    '1_week': '1 Week Notice',
-    '2_weeks': '2 Weeks Notice',
-    '1_month': '1 Month Notice',
-    '2_months': '2 Months Notice',
-    '3_months': '3 Months Notice'
-  };
-  
-  const drivingLicenseLabels = {
-    'two_wheel': 'Two-Wheeler',
-    'four_wheel': 'Four-Wheeler',
-    'other': 'Other',
-    'none': 'None'
-  };
-  
-  const highestQualificationLabels = {
-    'high_school': 'High School',
-    'diploma': 'Diploma',
-    'associate': 'Associate Degree',
-    'bachelor': 'Bachelor\'s Degree',
-    'master': 'Master\'s Degree',
-    'doctorate': 'Doctorate/PhD',
-    'professional_certification': 'Professional Certification'
-  };
-  
-  const visaStatusLabels = {
-    'tourist_visa': 'Tourist Visa',
-    'student_visa': 'Student Visa',
-    'work_visa': 'Work Visa / Employment Visa',
-    'business_visa': 'Business Visa',
-    'permanent_resident': 'Permanent Resident (PR)',
-    'spouse_dependent_visa': 'Spouse/Dependent Visa',
-    'transit_visa': 'Transit Visa',
-    'refugee_asylum_visa': 'Refugee/Asylum Visa',
-    'diplomatic_visa': 'Diplomatic Visa',
-    'investor_visa': 'Investor Visa / Startup Visa',
-    'na': 'N/A'
-  };
-
-  const currencyLabels = {
-    'USD': 'USD - US Dollar',
-    'EUR': 'EUR - Euro',
-    'GBP': 'GBP - British Pound',
-    'INR': 'INR - Indian Rupee',
-    'AUD': 'AUD - Australian Dollar',
-    'CAD': 'CAD - Canadian Dollar',
-    'JPY': 'JPY - Japanese Yen',
-    'CNY': 'CNY - Chinese Yuan',
-    'AED': 'AED - UAE Dirham',
-    'SAR': 'SAR - Saudi Riyal'
-  };
-
-  const genderLabels = {
-    'male': 'Male',
-    'female': 'Female',
-    'other': 'Other'
-  };
-  
-  const maritalStatusLabels = {
-    'married': 'Married',
-    'unmarried': 'Unmarried'
-  };
+  const maritalStatusOptions = ['single', 'married', 'unmarried', 'divorced'];
+  const currencyOptions = ['USD', 'AED', 'NPR', 'INR', 'EUR'];
+  const availabilityOptions = ['immediate', '1 week', '15 days', '1 month', '2 months'];
 
   // Update the input fields to show error messages
   const renderInputField = (name, label, type = 'text', icon, readOnly = false) => (
@@ -556,7 +365,7 @@ const ProfilePage = () => {
   );
 
   // Update the select fields to show error messages
-  const renderSelectField = (name, label, options, icon, customLabels = null) => (
+  const renderSelectField = (name, label, options, icon) => (
     <div className="space-y-2">
       <label className="text-gray-700 font-medium flex items-center space-x-2">
         {icon}
@@ -575,7 +384,7 @@ const ProfilePage = () => {
         <option value="">Select {label}</option>
         {options.map((option) => (
           <option key={option} value={option}>
-            {customLabels && customLabels[option] ? customLabels[option] : option}
+            {option}
           </option>
         ))}
       </select>
@@ -612,7 +421,7 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pt-24 pb-16">
       <ToastContainer position="top-right" autoClose={3000} />
       {loading && <Preloader />}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
+      <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Profile Header */}
           <div className="relative h-48 bg-gradient-to-r from-blue-600 to-indigo-600">
@@ -661,99 +470,47 @@ const ProfilePage = () => {
           </div>
 
           {/* Profile Content */}
-          <div className="pt-20 pb-8 px-4 sm:px-8">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Personal Information Section */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                  <FaUser className="text-blue-600 mr-3" />
-                  Personal Information
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {renderInputField('full_name', 'Full Name', 'text', <FaUser className="text-blue-600" />)}
-                  {renderInputField('username', 'Username', 'text', <FaUser className="text-blue-600" />, true)}
-                  {renderInputField('email', 'Email', 'email', <FaEnvelope className="text-blue-600" />, true)}
-                  {renderInputField('phone_number', 'Phone Number', 'tel', <FaPhone className="text-blue-600" />)}
-                  {renderSelectField('gender', 'Gender', genderOptions, <FaVenusMars className="text-blue-600" />, genderLabels)}
-                  {renderSelectField('marital_status', 'Marital Status', maritalStatusOptions, <FaRing className="text-blue-600" />, maritalStatusLabels)}
-                </div>
-              </div>
+          <div className="pt-20 pb-8 px-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                {renderInputField('full_name', 'Full Name', 'text', <FaUser className="text-blue-600" />)}
+                {renderInputField('username', 'Username', 'text', <FaUser className="text-blue-600" />, true)}
+                {renderInputField('email', 'Email', 'email', <FaEnvelope className="text-blue-600" />, true)}
+                {renderInputField('phone_number', 'Phone Number', 'tel', <FaPhone className="text-blue-600" />)}
+                {renderInputField('nationality', 'Nationality', 'text', <FaGlobe className="text-blue-600" />)}
+                {renderInputField('current_location', 'Current Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
+                {renderInputField('preferred_job_location', 'Preferred Job Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
+                {renderInputField('highest_qualification', 'Highest Qualification', 'text', <FaGraduationCap className="text-blue-600" />)}
+                {renderSelectField('years_of_experience', 'Years of Experience', experienceLevels, <FaBriefcase className="text-blue-600" />)}
 
-              {/* Location & Nationality Section */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                  <FaMapMarkerAlt className="text-blue-600 mr-3" />
-                  Location & Nationality
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {renderInputField('nationality', 'Nationality', 'text', <FaGlobe className="text-blue-600" />)}
-                  {renderInputField('current_location', 'Current Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
-                  {renderInputField('preferred_job_location', 'Preferred Job Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
-                  {renderInputField('linkedin_url', 'LinkedIn URL', 'url', <FaGlobe className="text-blue-600" />)}
-                </div>
-              </div>
-
-              {/* Education & Experience Section */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                  <FaGraduationCap className="text-blue-600 mr-3" />
-                  Education & Experience
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {renderSelectField('highest_qualification', 'Highest Qualification', highestQualificationOptions, <FaGraduationCap className="text-blue-600" />, highestQualificationLabels)}
-                  {renderSelectField('years_of_experience', 'Years of Experience', experienceLevels, <FaBriefcase className="text-blue-600" />)}
-                  {renderInputField('certificate', 'Certificate', 'text', <FaCertificate className="text-blue-600" />)}
-                  {renderInputField('preferred_designation', 'Preferred Designation', 'text', <FaBuilding className="text-blue-600" />)}
-                </div>
-                <div className="mt-6 space-y-4">
-                  {renderTextareaField('education_details', 'Education Details', <FaGraduationCap className="text-blue-600" />)}
-                  {renderTextareaField('past_employment_details', 'Past Employment Details', <FaHistory className="text-blue-600" />)}
-                </div>
-              </div>
-
-              {/* Salary & Availability Section */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                  <FaDollarSign className="text-blue-600 mr-3" />
-                  Salary & Availability
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
-                    <div className="lg:w-2/3">
-                      {renderInputField('expected_salary', 'Expected Salary', 'number', <FaDollarSign className="text-blue-600" />)}
-                    </div>
-                    <div className="lg:w-1/3">
-                      {renderSelectField('currency', 'Currency', currencyOptions, <FaDollarSign className="text-blue-600" />, currencyLabels)}
-                    </div>
+                <div className="flex space-x-4">
+                  <div className="w-2/3">
+                    {renderInputField('expected_salary', 'Expected Salary', 'number', <FaDollarSign className="text-blue-600" />)}
                   </div>
-                  {renderSelectField('availability_to_join', 'Availability to Join', availabilityOptions, <FaClock className="text-blue-600" />, availabilityLabels)}
+                  <div className="w-1/3">
+                    {renderSelectField('currency', 'Currency', currencyOptions, <FaDollarSign className="text-blue-600" />)}
+                  </div>
                 </div>
-              </div>
+                {renderInputField('certificate', 'Certificate', 'text', <FaCertificate className="text-blue-600" />)}
+                {renderSelectField('gender', 'Gender', genderOptions, <FaVenusMars className="text-blue-600" />)}
+                {renderSelectField('marital_status', 'Marital Status', maritalStatusOptions, <FaRing className="text-blue-600" />)}
+                {renderInputField('driving_license', 'Driving License', 'text', <FaIdCard className="text-blue-600" />)}
+                {renderInputField('languages', 'Languages (comma separated)', 'text', <FaLanguage className="text-blue-600" />)}
+                {renderInputField('visa_status', 'Visa Status', 'text', <FaPassport className="text-blue-600" />)}
+                {renderInputField('passport_expiry_date', 'Passport Expiry Date', 'date', <FaPassport className="text-blue-600" />)}
+                {renderTextareaField('education_details', 'Education Details', <FaGraduationCap className="text-blue-600" />)}
+                {renderInputField('preferred_designation', 'Preferred Designation', 'text', <FaBriefcase className="text-blue-600" />)}
+                {renderTextareaField('past_employment_details', 'Past Employment Details', <FaHistory className="text-blue-600" />)}
+                {renderSelectField('availability_to_join', 'Availability to Join', availabilityOptions, <FaClock className="text-blue-600" />)}
 
-              {/* Documents & Legal Section */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                  <FaPassport className="text-blue-600 mr-3" />
-                  Documents & Legal
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {renderSelectField('driving_license', 'Driving License', drivingLicenseOptions, <FaIdCard className="text-blue-600" />, drivingLicenseLabels)}
-                  {renderInputField('languages', 'Languages', 'text', <FaLanguage className="text-blue-600" />)}
-                  {renderSelectField('visa_status', 'Visa Status', visaStatusOptions, <FaPassport className="text-blue-600" />, visaStatusLabels)}
-                  {renderInputField('passport_expiry_date', 'Passport Expiry Date', 'date', <FaPassport className="text-blue-600" />)}
-                </div>
-              </div>
-
-              {/* Resume Upload Section */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-                  <FaFileUpload className="text-blue-600 mr-3" />
-                  Resume Upload
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-4">
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-gray-700 font-medium flex items-center space-x-2">
+                    <FaFileUpload className="text-blue-600" />
+                    <span>Resume</span>
+                  </label>
+                  <div className="flex items-center space-x-4">
                     {existingResume ? (
-                      <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-2 lg:space-y-0 lg:space-x-4">
+                      <div className="flex items-center space-x-4">
                         <span className="text-gray-700">Current Resume:</span>
                         <a 
                           href={existingResume} 
@@ -763,7 +520,7 @@ const ProfilePage = () => {
                         >
                           View Resume
                         </a>
-                        <span className="text-gray-500 hidden lg:inline">|</span>
+                        <span className="text-gray-500">|</span>
                         <a 
                           href={existingResume} 
                           download
@@ -776,28 +533,40 @@ const ProfilePage = () => {
                       <span className="text-gray-500">No resume uploaded</span>
                     )}
                     {isEditing && (
-                      <div className="flex items-center space-x-2">
+                      <>
                         <input
                           type="file"
                           accept=".pdf"
                           onChange={handleResumeChange}
-                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          className="hidden"
+                          id="resume-upload"
                         />
-                        {formErrors.resume && (
-                          <p className="text-red-500 text-sm">{formErrors.resume}</p>
+                        <label
+                          htmlFor="resume-upload"
+                          className="px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                        >
+                          {existingResume ? 'Update Resume' : 'Upload Resume'}
+                        </label>
+                        {resumeFile && (
+                          <span className="text-gray-500">
+                            New file: {resumeFile.name}
+                          </span>
                         )}
-                      </div>
+                      </>
                     )}
                   </div>
+                  {formErrors.resume && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.resume}</p>
+                  )}
                 </div>
               </div>
 
               {isEditing && (
-                <div className="flex justify-end pt-6">
+                <div className="flex justify-end">
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center space-x-2 ${
+                    className={`bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center space-x-2 ${
                       loading ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Eye, EyeOff } from 'lucide-react';
 
 const ChangePasswordPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ const ChangePasswordPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // State for password visibility
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -41,9 +47,9 @@ const ChangePasswordPage = () => {
           'Authorization': `Token ${token}`,
         },
         body: JSON.stringify({
-          email: JSON.parse(sessionStorage.getItem('user'))?.email,
-          password: newPassword,
-          confirm_password: confirmNewPassword,
+          old_password: oldPassword,
+          new_password: newPassword,
+          confirm_new_password: confirmNewPassword,
         }),
       });
 
@@ -83,48 +89,75 @@ const ChangePasswordPage = () => {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="old-password" className="sr-only">Old Password</label>
-              <input
-                id="old-password"
-                name="old-password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Old Password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  id="old-password"
+                  name="old-password"
+                  type={showOldPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Old Password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowOldPassword(!showOldPassword)}
+                >
+                  {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="new-password" className="sr-only">New Password</label>
-              <input
-                id="new-password"
-                name="new-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  id="new-password"
+                  name="new-password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="confirm-new-password" className="sr-only">Confirm New Password</label>
-              <input
-                id="confirm-new-password"
-                name="confirm-new-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm New Password"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  id="confirm-new-password"
+                  name="confirm-new-password"
+                  type={showConfirmNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Confirm New Password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                >
+                  {showConfirmNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
           </div>
 

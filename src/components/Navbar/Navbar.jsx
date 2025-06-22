@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
 import { Link, useNavigate,useLocation } from 'react-router-dom';
-import zenLogo from '../../assets/ZEN LLC LOGO.svg';
+import zenLogo from '../../assets/logo.png';
 import Button from '../Button';
 
 const Navbar = () => {
@@ -54,26 +54,27 @@ const Navbar = () => {
   };
 
   return (
-<nav className={`${scrolled ? 'bg-white shadow-md' : 'bg-transparent shadow-none'} fixed w-full z-[1000] transition-all duration-300`}>
-
+    <nav className={`${scrolled ? 'bg-white shadow-md' : 'bg-transparent shadow-none'} fixed w-full z-[1000] transition-all duration-300`}>
       <div className="container mx-auto">
-        <div className="flex justify-between h-20 items-center px-4 sm:px-6 lg:px-20">
+        <div className="flex justify-between h-20 items-center px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
               <img
                 src={zenLogo}
                 alt="Zen Career Hub"
-                className="h-16 md:h-24 w-auto object-contain"
+                className="h-12 md:h-16 lg:h-20 w-auto object-contain"
               />
             </Link>
           </div>
           
           {/* Centered Navigation Links (Hidden on mobile) */}
-          <div className="flex-grow hidden md:flex justify-center items-center space-x-8">
-            <Link to="/" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6`}>Home</Link>
-            <Link to="/about" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6`}>About</Link>
-            <Link to="/jobs" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6`}>Jobs</Link>
-            <Link to="/contact" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6`}>
+          <div className="flex-grow hidden lg:flex justify-center items-center space-x-6 xl:space-x-8">
+            <Link to="/" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6 text-sm xl:text-base`}>Home</Link>
+            <Link to="/about" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6 text-sm xl:text-base`}>About</Link>
+            <Link to="/jobs" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6 text-sm xl:text-base`}>Jobs</Link>
+            <Link to="/clients" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6 text-sm xl:text-base`}>Our Clients</Link>
+            <Link to="/team" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6 text-sm xl:text-base`}>Our Team</Link>
+            <Link to="/contact" className={`text-gray-700 hover:text-blue-600 transition-colors hover:underline py-2 pb-0.5 leading-6 text-sm xl:text-base`}>
               Contact
             </Link>
           </div>
@@ -83,7 +84,7 @@ const Navbar = () => {
             {/* Desktop Profile/Logout or Register button (hidden on mobile) */}
             {user ? (
               // Profile/Logout dropdown
-              <div className="relative hidden md:block">
+              <div className="relative hidden lg:block">
                 <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors">
                   {user.profile_picture ? (
                     <img
@@ -95,7 +96,7 @@ const Navbar = () => {
                   ) : (
                     <FaUserCircle className="text-2xl" />
                   )}
-                  <span>{user.full_name || user.name || user.email}</span>
+                  <span className="text-sm xl:text-base">{user.full_name || user.name || user.email}</span>
                 </button>
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
@@ -126,14 +127,14 @@ const Navbar = () => {
               </div>
             ) : (
               // Login and Register buttons
-              <div className="hidden md:flex items-center space-x-4">
-                <Button to="/login" variant="secondary" className={` ${scrolled ? '' : ''}`}>Login</Button>
-                <Button to="/register" variant="primary" className={` ${scrolled ? '' : ''}`}>Register</Button>
+              <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
+                <Button to="/login" variant="secondary" className={`text-sm xl:text-base ${scrolled ? '' : ''}`}>Login</Button>
+                <Button to="/register" variant="primary" className={`text-sm xl:text-base ${scrolled ? '' : ''}`}>Register</Button>
               </div>
             )}
 
             {/* Mobile menu toggle button (hidden on desktop) */}
-            <div className="md:hidden flex items-center">
+            <div className="lg:hidden flex items-center">
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`text-gray-700 hover:text-blue-600 transition-colors ${scrolled ? 'text-gray-700' : 'text-gray-700'}`}><FaBars className="text-2xl" /></button>
             </div>
           </div>
@@ -142,7 +143,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg">
+        <div className="lg:hidden bg-white shadow-lg">
           <div className="px-4 pt-2 pb-3 space-y-1">
             <Link 
               to="/" 
@@ -164,6 +165,20 @@ const Navbar = () => {
               onClick={handleMenuClick}
             >
               Jobs
+            </Link>
+            <Link 
+              to="/clients" 
+              className="block px-3 py-2 pb-0.5 text-gray-700 hover:text-blue-600 transition-colors hover:underline leading-6"
+              onClick={handleMenuClick}
+            >
+              Our Clients
+            </Link>
+            <Link 
+              to="/team" 
+              className="block px-3 py-2 pb-0.5 text-gray-700 hover:text-blue-600 transition-colors hover:underline leading-6"
+              onClick={handleMenuClick}
+            >
+              Our Team
             </Link>
             <Link 
               to="/contact" 

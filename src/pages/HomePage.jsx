@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, Globe, MapPin, CheckCircle, Users, Briefcase, Award, ChevronRight, Star, DollarSign } from "lucide-react"
+import { Phone, Mail, Globe, MapPin, CheckCircle, Users, Briefcase, Award, ChevronRight, Star, DollarSign, Calendar } from "lucide-react"
 import team1 from '../assets/aashish.jpeg'
 import team2 from '../assets/our team 2.jpeg'
 import team3 from '../assets/roshan kc.jpg'
@@ -89,8 +89,8 @@ export default function HomePage() {
     const fetchCategories = async () => {
       try {
         const data = await getCategoriesWithCount();
-        // Filter categories with job_count > 0 if needed, or display all
-        setCategories(data.filter(category => category.job_count > 0)); // Example: only show categories with jobs
+        // Remove the filter to show all categories
+        setCategories(data);
       } catch (err) {
         setErrorCategories(err.message);
       } finally {
@@ -110,7 +110,7 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative bg-white overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20 pt-16 md:pt-20 pb-12 md:pb-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 pt-16 md:pt-20 pb-12 md:pb-16">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center relative z-10">
             <div className="space-y-6 md:space-y-8">
               <div>
@@ -135,6 +135,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+            
             <div className="relative">
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full filter blur-3xl opacity-50"></div>
               <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-200 rounded-full filter blur-3xl opacity-50"></div>
@@ -154,7 +155,7 @@ export default function HomePage() {
 
       {/* Trending Jobs Section */}
       <section className="py-12 md:py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Trending Jobs</h2>
@@ -169,7 +170,7 @@ export default function HomePage() {
             <p className="text-center text-gray-600 text-lg">No trending jobs available at the moment.</p>
           )}
           {!loadingTrending && !errorTrending && trendingJobs.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
               {trendingJobs.map((job, index) => (
                 <div 
                   key={job.id} 
@@ -197,37 +198,42 @@ export default function HomePage() {
                   {/* Job Description */}
                   <p className="text-gray-700 text-sm mb-4 leading-relaxed line-clamp-3">{stripHtml(job.job_description)}</p>
 
-                  {/* Location and Type */}
-                  <div className="flex items-center gap-4 mb-6 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-blue-500" />
-                      <span>{job.company.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                       {/* Using Briefcase icon based on API data and previous card design */}
-                      <Briefcase className="w-4 h-4 text-blue-500" />
-                      <span>{job.job_type === 'full_time' ? 'Full Time' : job.job_type === 'part_time' ? 'Part Time' : job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}</span>
-                    </div>
+                  {/* Job Details */}
+                  <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
+                    <span className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-1 text-blue-500"/>
+                      {job.company.location}
+                    </span>
+                    <span className="flex items-center">
+                      <Briefcase className="w-4 h-4 mr-1 text-blue-500"/>
+                      {job.job_type === 'full_time' ? 'Full Time' : 
+                       job.job_type === 'part_time' ? 'Part Time' : 
+                       job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
+                    </span>
+                    <span className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-1 text-blue-500"/>
+                      Deadline: {formatDate(job.deadline)}
+                    </span>
                   </div>
 
                   {/* Salary and Apply Button */}
                   <div className="flex justify-between items-center mt-4">
                     <div>
-                       {/* Using DollarSign icon and salary_range from API */}
                       <span className="text-xl font-bold text-gray-800 flex items-baseline">
                         {job.salary_range}
-                         <span className="text-gray-600 text-sm ml-1">/mo</span>
+                        <span className="text-gray-600 text-sm ml-1">/mo</span>
                       </span>
                     </div>
-                    <button 
+                    <Button
                       onClick={(e) => {
-                         e.stopPropagation(); // Prevent card click from navigating
-                         handleJobClick(job.id);
+                        e.stopPropagation();
+                        handleJobClick(job.id);
                       }}
-                      className="text-gray-800 font-medium transition-colors duration-200"
+                      variant="secondary"
+                      className="transition-colors duration-200 shadow-sm"
                     >
-                      See Details
-                    </button>
+                      Apply Now
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -261,7 +267,7 @@ export default function HomePage() {
 
       {/* About Section with Stats */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative">
               <div className="absolute top-1/4 -left-5 w-72 h-72 bg-blue-50 rounded-full filter blur-3xl opacity-70 z-0"></div>
@@ -276,23 +282,23 @@ export default function HomePage() {
                   />
                   <Image
                     src="https://images.unsplash.com/photo-1653669486789-72a1124a0a26?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDJ8fHxlbnwwfHx8fHw%3D"
-                    alt="Office"
+                    alt="Team"
                     width={600}
-                    height={600}
-                    className="rounded-2xl shadow-lg h-48 object-cover"
+                    height={800}
+                    className="rounded-2xl shadow-lg h-80 object-cover"
                   />
                 </div>
-                <div className="space-y-4 mt-8">
+                <div className="space-y-4 pt-8">
                   <Image
-                    src="https://images.unsplash.com/photo-1653669486960-9d4c6f3fcbdd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDl8fHxlbnwwfHx8fHw%3D"
-                    alt="Meeting"
+                    src="https://images.unsplash.com/photo-1653669486803-72a1124a0a27?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDN8fHxlbnwwfHx8fHw%3D"
+                    alt="Team"
                     width={600}
-                    height={600}
-                    className="rounded-2xl shadow-lg h-48 object-cover"
+                    height={800}
+                    className="rounded-2xl shadow-lg h-80 object-cover"
                   />
                   <Image
-                    src="https://plus.unsplash.com/premium_photo-1676651178807-d5b7ddfdf2f6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE2fHx8ZW58MHx8fHx8"
-                    alt="Consulting"
+                    src="https://images.unsplash.com/photo-1653669486817-72a1124a0a28?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDR8fHxlbnwwfHx8fHw%3D"
+                    alt="Team"
                     width={600}
                     height={800}
                     className="rounded-2xl shadow-lg h-80 object-cover"
@@ -302,21 +308,34 @@ export default function HomePage() {
             </div>
             <div className="space-y-8">
               <div>
-                <h2 className="text-[40px] font-bold text-slate-900 mb-4 animate-item">Premier HR Consultancy in Dubai</h2>
-                <div className="w-20 h-1 bg-blue-500 animate-item"></div>
+                <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">About ZEN Career Hub</h2>
+                <div className="w-20 h-1 bg-blue-500 mb-6"></div>
+                <p className="text-[19px] leading-[19.2px] text-gray-900 mb-6">
+                  We are a premier human capital solutions provider headquartered in Dubai, connecting skilled professionals with global opportunities.
+                </p>
+                <p className="text-gray-600 leading-relaxed">
+                  Our extensive network spans multiple countries, providing access to diverse talent pools and comprehensive HR solutions tailored to meet the unique needs of modern businesses and professionals.
+                </p>
               </div>
-              <p className="text-xl text-slate-600 animate-item">
-                ZEN Career Hub HR Consultancies is a premier human capital solutions provider headquartered in Dubai,
-                UAE. Under the visionary leadership of CEO Mr. Aashish Khokhali, we are committed to delivering ethical,
-                efficient, and customized HR solutions.
-              </p>
-              <p className="text-xl text-slate-600 animate-item">
-                Our strategic alliance with Zen Edu Hub in Nepal enhances our reach and effectiveness in sourcing
-                top-tier talent from South Asia.
-              </p>
-            
               
-             
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">500+</div>
+                  <div className="text-gray-600">Companies Served</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">1000+</div>
+                  <div className="text-gray-600">Successful Placements</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">50+</div>
+                  <div className="text-gray-600">Countries Covered</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600 mb-2">95%</div>
+                  <div className="text-gray-600">Client Satisfaction</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -324,7 +343,7 @@ export default function HomePage() {
 
       {/* Vision & Mission */}
       <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="text-center mb-16">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Vision & Mission</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto"></div>
@@ -409,9 +428,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Job Categories Section - Added */}
+      {/* Job Categories Section */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Job Categories</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
@@ -426,7 +445,7 @@ export default function HomePage() {
             <p className="text-center text-gray-600 text-lg">No job categories available at the moment with active jobs.</p>
           )}
           {!loadingCategories && !errorCategories && categories.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
               {categories.map(category => (
                 <div key={category.id} className="bg-blue-50 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
                   <h3 className="text-xl font-semibold text-blue-700 mb-2">{category.name}</h3>
@@ -439,142 +458,44 @@ export default function HomePage() {
       </section>
 
       {/* Services */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="text-center mb-16">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Services</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
             <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
-              We offer comprehensive HR solutions tailored to meet the unique needs of both employers and job seekers.
+              Comprehensive HR solutions tailored to meet the diverse needs of modern businesses and professionals.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="group">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <Image
-                  src="https://images.unsplash.com/photo-1698047681452-08eba22d0c64?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8b3ZlcnNlYXMlMjBoaXJpbmd8ZW58MHx8MHx8fDA%3D"
-                  alt="Overseas Hiring"
-                  width={800}
-                  height={600}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Overseas Hiring Solutions</h3>
-                  <div className="w-12 h-1 bg-blue-500"></div>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
+                <Users className="h-8 w-8 text-blue-400" />
               </div>
-              <p className="text-base leading-relaxed text-gray-900 mb-8">
-                We connect employers with qualified candidates across various industries, ensuring a perfect fit for
-                roles in the Gulf region and beyond.
+              <h3 className="text-xl font-bold mb-4">Talent Acquisition</h3>
+              <p className="text-base leading-relaxed text-slate-300">
+                We connect employers with qualified candidates across various industries, ensuring a perfect fit for roles in the Gulf region and beyond.
               </p>
             </div>
 
-            <div className="group">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <Image
-                  src="https://images.unsplash.com/photo-1565688527174-775059ac429c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8b3ZlcnNlYXMlMjBoaXJpbmd8ZW58MHx8MHx8fDA%3D"
-                  alt="Local Placements"
-                  width={800}
-                  height={600}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Local & International Placements</h3>
-                  <div className="w-12 h-1 bg-blue-500"></div>
-                </div>
+            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
+                <Globe className="h-8 w-8 text-blue-400" />
               </div>
-              <p className="text-base leading-relaxed text-gray-900 mb-8">
-                Our extensive network enables us to place professionals in positions that align with their skills and
-                career aspirations, both within the UAE and internationally.
+              <h3 className="text-xl font-bold mb-4">Global Network</h3>
+              <p className="text-base leading-relaxed text-slate-300">
+                Our extensive network spans multiple countries, providing access to diverse talent pools and comprehensive HR solutions.
               </p>
             </div>
 
-            <div className="group">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <Image
-                  src="https://images.unsplash.com/photo-1565688335719-d0297c355556?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fG92ZXJzZWFzJTIwaGlyaW5nfGVufDB8fDB8fDB"
-                  alt="Immigration Services"
-                  width={800}
-                  height={600}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Immigration Services</h3>
-                  <div className="w-12 h-1 bg-blue-500"></div>
-                </div>
+            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
+                <CheckCircle className="h-8 w-8 text-blue-400" />
               </div>
-              <p className="text-base leading-relaxed text-gray-900 mb-8">
-                We offer comprehensive immigration support, including visa processing and legal compliance, to
-                facilitate smooth transitions for expatriates.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mt-12">
-            <div className="group">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <Image
-                  src="https://images.unsplash.com/photo-1516382799247-87df95d790b7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZXhlY3V0aXZlJTIwc2VhcmNofGVufDB8fDB8fHww"
-                  alt="Executive Search"
-                  width={800}
-                  height={600}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Talent Acquisition & Executive Search</h3>
-                  <div className="w-12 h-1 bg-blue-500"></div>
-                </div>
-              </div>
-              <p className="text-base leading-relaxed text-gray-900 mb-8">
-                Our dedicated team specializes in sourcing and placing top-tier executives and specialized professionals
-                to drive organizational growth.
-              </p>
-            </div>
-
-            <div className="group">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <Image
-                  src="https://images.unsplash.com/photo-1551135049-8a33b5883817?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y29uc3VsdGFudHxlbnwwfHwwfHx8MA%3D%3D"
-                  alt="HR Consultancy"
-                  width={800}
-                  height={600}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">HR Consultancy Services</h3>
-                  <div className="w-12 h-1 bg-blue-500"></div>
-                </div>
-              </div>
-              <p className="text-base leading-relaxed text-gray-900 mb-8">
-                We provide strategic HR consulting, including policy development, performance management, and
-                organizational structuring, to optimize workforce efficiency.
-              </p>
-            </div>
-
-            <div className="group">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <Image
-                  src="https://plus.unsplash.com/premium_photo-1705267936187-aceda1a6c1a6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dHJhaW5pbmclMjBhbmQlMjBkZXZlbG9wbWVudHxlbnwwfHwwfHx8MA%3D%3D"
-                  alt="Training & Development"
-                  width={800}
-                  height={600}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-[28px] font-medium text-white mb-2 leading-[33.6px]">Training & Development</h3>
-                  <div className="w-12 h-1 bg-blue-500"></div>
-                </div>
-              </div>
-              <p className="text-base leading-relaxed text-gray-900 mb-8">
-                Our tailored training programs enhance employee skills and performance, contributing to overall
-                organizational success.
+              <h3 className="text-xl font-bold mb-4">Proven Results</h3>
+              <p className="text-base leading-relaxed text-slate-300">
+                Our track record of successful placements and satisfied clients speaks to our effectiveness and reliability.
               </p>
             </div>
           </div>
@@ -585,13 +506,13 @@ export default function HomePage() {
       <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-10"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-[28px] font-medium mb-2 leading-[33.6px]">Why Choose ZEN Career Hub?</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
             <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
               <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
                 <MapPin className="h-8 w-8 text-blue-400" />
@@ -658,7 +579,7 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-20 bg-[#283588] text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="md:w-2/3">
               <h2 className="text-[28px] font-medium mb-2 leading-[33.6px]">Ready to Transform Your Hiring Process?</h2>
@@ -678,7 +599,7 @@ export default function HomePage() {
 
       {/* Our Team Section */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Team</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
@@ -692,39 +613,39 @@ export default function HomePage() {
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
                 <img src={team4} alt="Binod Timalsina" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">Binod Timalsina</h3>
-              <p className="text-blue-600 font-medium">Chairman</p>
-              <p className="text-sm text-gray-600 mt-2">Sukilo General Trading LLC / Sukilo Properties / Zen Career Hub HR</p>
+              <h3 className="text-xl font-bold text-blue-900 mb-2">Binod Timalsina</h3>
+              <p className="text-blue-600 font-medium mb-2">CEO & Founder</p>
+              <p className="text-gray-600 text-sm">Leading ZEN Career Hub with vision and expertise in international recruitment.</p>
             </div>
 
             {/* Team Member 2 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
-                <img src={team1} alt="Aashish Khokhali" className="w-full h-full object-cover" />
+                <img src={team2} alt="Aashish Timalsina" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">Aashish Khokhali</h3>
-              <p className="text-blue-600 font-medium">CEO</p>
-              <p className="text-sm text-gray-600 mt-2">Zen Edu and Career Hub Pvt Ltd / Zen Career Hub HR Consultancy LLC</p>
+              <h3 className="text-xl font-bold text-blue-900 mb-2">Aashish Timalsina</h3>
+              <p className="text-blue-600 font-medium mb-2">Managing Director</p>
+              <p className="text-gray-600 text-sm">Overseeing operations and strategic growth across all regions.</p>
             </div>
 
             {/* Team Member 3 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
-                <img src={team2} alt="Kiran BK" className="w-full h-full object-cover" />
+                <img src={team3} alt="Roshan KC" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">Kiran BK</h3>
-              <p className="text-blue-600 font-medium">Managing Partner</p>
-              <p className="text-sm text-gray-600 mt-2">Zen Career Hub HR Consultancy LLC</p>
+              <h3 className="text-xl font-bold text-blue-900 mb-2">Roshan KC</h3>
+              <p className="text-blue-600 font-medium mb-2">Operations Manager</p>
+              <p className="text-gray-600 text-sm">Ensuring smooth operations and exceptional client service delivery.</p>
             </div>
 
             {/* Team Member 4 */}
             <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
               <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
-                <img src={team3} alt="Roshan KC" className="w-full h-full object-cover" />
+                <img src={team1} alt="Team Member" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">Roshan KC</h3>
-              <p className="text-blue-600 font-medium">Operation Head</p>
-              <p className="text-sm text-gray-600 mt-2">Zen Career Hub HR Consultancy LLC</p>
+              <h3 className="text-xl font-bold text-blue-900 mb-2">Dedicated Team</h3>
+              <p className="text-blue-600 font-medium mb-2">HR Professionals</p>
+              <p className="text-gray-600 text-sm">Our experienced team of HR professionals committed to excellence.</p>
             </div>
           </div>
         </div>
@@ -732,55 +653,61 @@ export default function HomePage() {
 
       {/* Contact and Map Section - Added */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             {/* Map Column */}
             <div>
               <GoogleMap />
             </div>
-
             {/* Contact Info Column */}
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">We'd Love to Hear From You!</h2>
-              <p className="text-lg text-gray-700 leading-relaxed">
-                Whether you have a question about our services, need assistance, or just want to talk, we're here for you.
-              </p>
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Get in Touch</h2>
+                <div className="w-20 h-1 bg-blue-500 mb-6"></div>
+                <p className="text-[19px] leading-[19.2px] text-gray-900 mb-6">
+                  Ready to start your journey with ZEN Career Hub? Contact us today.
+                </p>
+              </div>
               
-              <div className="space-y-4">
-                {/* Email */}
+              <div className="space-y-6">
                 <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Mail className="text-blue-600 h-6 w-6" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Phone className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Email Address</h4>
-                    <a href="mailto:info@zencareerhub.ae" className="text-blue-600 hover:underline">info@zencareerhub.ae</a>
+                    <h3 className="font-semibold text-gray-900">Phone</h3>
+                    <p className="text-gray-600">+971-42807200</p>
+                    <p className="text-gray-600">+971-526513813</p>
                   </div>
                 </div>
-                {/* Phone */}
+                
                 <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Phone className="text-blue-600 h-6 w-6" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Mail className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Phone Number</h4>
-                    <a href="tel:+971566214420" className="text-blue-600 hover:underline">+971 56 621 4420</a>
+                    <h3 className="font-semibold text-gray-900">Email</h3>
+                    <p className="text-gray-600">info@zencareerhub.ae</p>
                   </div>
                 </div>
-                {/* Address */}
+                
                 <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <MapPin className="text-blue-600 h-6 w-6" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <MapPin className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800">Office Address</h4>
-                    <p className="text-gray-700 leading-relaxed">
-                       Office 402, Sultan Group Investments Building<br />
-                       Al Ittihad Road, Opposite The Emirates Group<br />
-                       Al Khabaisi, Dubai, UAE
-                    </p>
+                    <h3 className="font-semibold text-gray-900">Address</h3>
+                    <p className="text-gray-600">Office 402, Sultan Building<br />Port Saeed, Deira, Dubai</p>
                   </div>
                 </div>
+              </div>
+              
+              <div className="pt-4">
+                <Link to="/contact">
+                  <Button to="/contact" variant="primary" className="w-full md:w-auto">
+                    Contact Us
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

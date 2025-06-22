@@ -9,7 +9,7 @@ const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-24">
       {/* Header */}
-      <header className="bg-blue-600 text-white">
+      <header className="bg-[#283588] text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-16 md:py-24 text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 animate-fade-in">Get In Touch</h1>
           <p className="max-w-2xl mx-auto text-blue-100 md:text-lg">
@@ -42,14 +42,7 @@ const ContactPage = () => {
         </div>
       </main>
       
-      {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200 mt-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-8">
-          <p className="text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} ZEN Career Hub. All rights reserved.
-          </p>
-        </div>
-      </footer>
+     
     </div>
   );
 };

@@ -273,7 +273,7 @@ export default function JobDetailsPage() {
 
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 py-6">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="flex-shrink-0">
               <img
@@ -310,7 +310,7 @@ export default function JobDetailsPage() {
                 }}
                 disabled={hasApplied}
                 variant={hasApplied ? "secondary" : "primary"}
-                className={`w-auto ${hasApplied ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
+                className={`w-full md:w-auto ${hasApplied ? "!bg-green-600 !hover:bg-green-700 !text-white" : ""}`}
               >
                 {hasApplied ? (
                   <div className="flex items-center gap-2"><CheckCircle className="h-5 w-5" />Applied</div>
@@ -323,10 +323,11 @@ export default function JobDetailsPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Main Content */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-6">
             {/* Company Description */}
             <Card>
               <CardHeader>
@@ -417,7 +418,9 @@ export default function JobDetailsPage() {
                     <Clock className="h-4 w-4 text-blue-600" />
                     <span className="text-sm font-medium">Job Type</span>
                   </div>
-                  <Badge variant="outline">{job.job_type.replace("_", " ").toUpperCase()}</Badge>
+                  <Badge variant="outline">
+                    {job.job_type ? job.job_type.replace("_", " ").toUpperCase() : 'Not Specified'}
+                  </Badge>
                 </div>
 
                 <Separator />
