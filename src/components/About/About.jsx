@@ -142,7 +142,7 @@ const About = () => {
       </section>
 
       {/* Short Intro Section */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 text-center">
           <p className="font-bold text-2xl md:text-3xl mb-6 text-blue-800">Zen Career Hub HR Consultancy is a dynamic entity under the Zen Group of Companies, based in Dubai with regional offices in Nepal and the UK.</p>
           <p className="text-lg text-gray-700 max-w-4xl mx-auto leading-relaxed">
@@ -152,17 +152,17 @@ const About = () => {
       </section>
 
       {/* Vision & Mission Section */}
-      <section className="py-16 bg-blue-800">
+      <section className="py-20 bg-blue-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div className="mb-8 md:mb-0">
-              <h2 className="text-2xl font-bold text-white mb-4">VISION</h2>
+              <h2 className="text-2xl font-bold text-white mb-12">VISION</h2>
               <p className="text-lg text-blue-100">
                 To be a globally recognized HR consultancy that empowers individuals and organizations through innovative and ethical talent solutions.
               </p>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white mb-4">MISSION</h2>
+              <h2 className="text-2xl font-bold text-white mb-12">MISSION</h2>
               <ul className="list-disc pl-5 space-y-3 text-lg text-blue-100">
                 <li>To provide seamless recruitment and immigration services that facilitate career growth and organizational success.</li>
                 <li>To uphold the highest standards of integrity, transparency, and professionalism in all our engagements.</li>
@@ -178,7 +178,7 @@ const About = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-5"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full filter blur-3xl opacity-5"></div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium mb-2 leading-[33.6px] text-blue-800">Why Choose Us?</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
           </div>
@@ -250,10 +250,10 @@ const About = () => {
       {/* Services Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium mb-2 leading-[33.6px] text-blue-800">Our Services</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
               Comprehensive HR solutions tailored to meet the diverse needs of modern businesses and professionals.
             </p>
           </div>
@@ -286,10 +286,10 @@ const About = () => {
       {/* Core Values Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium mb-2 leading-[33.6px] text-blue-800">Our Core Values</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
               The principles that guide our actions and define our commitment to excellence.
             </p>
           </div>
@@ -313,7 +313,7 @@ const About = () => {
       </section>
 
       {/* CTA Section: Based in the UAE */}
-      <section className="py-16 bg-gradient-to-br from-blue-900 to-blue-500">
+      <section className="py-20 bg-gradient-to-br from-blue-900 to-blue-500">
         <div className="container mx-auto px-4 sm:px-6 lg:px-20 flex flex-col md:flex-row items-center md:items-start gap-8">
           <div className="flex-shrink-0 flex justify-center md:justify-start w-full md:w-auto mb-4 md:mb-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" className="w-20 h-20 text-white"><circle cx="32" cy="32" r="31" stroke="white" strokeWidth="2" fill="none"/><path d="M32 44c6-7.5 12-15.5 12-20A12 12 0 1 0 20 24c0 4.5 6 12.5 12 20z" stroke="white" strokeWidth="2" fill="none"/><circle cx="32" cy="24" r="4" stroke="white" strokeWidth="2" fill="none"/></svg>
@@ -330,7 +330,7 @@ const About = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-blue-800 mb-4">Our Global Presence</h2>
-            <p className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">We serve clients and candidates across the globe.</p>
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto mb-6">We serve clients and candidates across the globe.</p>
           </div>
           <div className="relative w-full flex justify-center items-center overflow-x-hidden" style={{ perspective: '1200px', height: '380px' }}>
             <div ref={carouselRef} className="flex items-center w-full h-full justify-center">

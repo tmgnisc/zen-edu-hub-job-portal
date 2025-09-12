@@ -109,6 +109,11 @@ const Footer = () => {
 
         <div className="mt-8 text-center text-gray-300">
           <p>© {new Date().getFullYear()} Zen Career Hub. All rights reserved.</p>
+          <div className="mt-2">
+            <Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors underline">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

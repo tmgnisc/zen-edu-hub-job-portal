@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Eye, EyeOff } from 'lucide-react'; // Import eye icons
+import { Eye, EyeOff, User, Mail, Lock, Shield, ArrowLeft } from 'lucide-react'; // Import additional icons
 import Button from '../components/Button'; // Import the reusable Button component
 
 const RegisterPage = () => {
@@ -39,7 +39,7 @@ const RegisterPage = () => {
 
   const validateSignupForm = () => {
     if (!signup.username.trim()) {
-      setError('Username is required');
+      setError('Full Name is required');
       return false;
     }
     if (!validateEmail(signup.email)) {
@@ -201,169 +201,234 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-20">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <div className="text-center mb-6">
-          {/* Replace with your logo or app name */}
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Create an Account</h1>
-          <p className="text-gray-600">Sign up to get started</p>
+      
+      {/* Main Content */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 text-white text-center">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="h-8 w-8" />
+              </div>
+              <h1 className="text-2xl font-bold mb-2">Create Account</h1>
+              <p className="text-blue-100">Join our community and start your journey</p>
         </div>
 
+            {/* Form Content */}
+            <div className="p-8">
         {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded-lg mb-4 text-center">
-            {error}
+                <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg mb-6 flex items-center gap-3">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <span className="text-sm font-medium">{error}</span>
           </div>
         )}
 
         {success && showOtpVerification && (
-           <div className="bg-green-50 text-green-500 p-3 rounded-lg mb-4 text-center">
-             {success}
+                <div className="bg-green-50 border border-green-200 text-green-600 p-4 rounded-lg mb-6 flex items-center gap-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium">{success}</span>
            </div>
          )}
 
         {!showOtpVerification ? (
           <form onSubmit={handleSignupSubmit} className="space-y-6">
+                  {/* Full Name Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Username</label>
+                    <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <User className="h-4 w-4 text-blue-600" />
+                      Full Name
+                    </label>
               <input
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
                 value={signup.username}
                 onChange={e => setSignup({ ...signup, username: e.target.value })}
+                      placeholder="Enter your full name"
                 required
                 disabled={isLoading}
               />
             </div>
+
+                  {/* Email Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-blue-600" />
+                      Email Address
+                    </label>
               <input
                 type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
                 value={signup.email}
                 onChange={e => setSignup({ ...signup, email: e.target.value })}
+                      placeholder="Enter your email address"
                 required
                 disabled={isLoading}
               />
                {signup.email && !validateEmail(signup.email) && (
-                <p className="text-red-500 text-xs mt-1">Please enter a valid email address.</p>
+                      <p className="text-red-500 text-xs flex items-center gap-1">
+                        <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+                        Please enter a valid email address
+                      </p>
               )}
             </div>
+
+                  {/* Password Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+                    <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Lock className="h-4 w-4 text-blue-600" />
+                      Password
+                    </label>
               <div className="relative">
                 <input
                   type={showSignupPassword ? 'text' : 'password'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
                   value={signup.password}
                   onChange={e => setSignup({ ...signup, password: e.target.value })}
+                        placeholder="Create a strong password"
                   required
                   disabled={isLoading}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                   onClick={() => setShowSignupPassword(!showSignupPassword)}
                 >
                   {showSignupPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
+
+                  {/* Confirm Password Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      Confirm Password
+                    </label>
               <div className="relative">
                 <input
                   type={showSignupConfirmPassword ? 'text' : 'password'}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400"
                   value={signup.confirm_password}
                   onChange={e => setSignup({ ...signup, confirm_password: e.target.value })}
+                        placeholder="Confirm your password"
                   required
                   disabled={isLoading}
                 />
                  <button
                    type="button"
-                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
                    onClick={() => setShowSignupConfirmPassword(!showSignupConfirmPassword)}
                  >
                    {showSignupConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                  </button>
               </div>
                {signup.confirm_password && signup.password !== signup.confirm_password && (
-                 <p className="text-red-500 text-xs mt-1">Passwords do not match.</p>
+                      <p className="text-red-500 text-xs flex items-center gap-1">
+                        <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+                        Passwords do not match
+                      </p>
               )}
             </div>
         
+                  {/* Submit Button */}
             <Button
               type="submit"
               variant="primary"
-              className="w-full flex items-center justify-center"
+                    className="w-full py-3 text-base font-semibold flex items-center justify-center gap-2"
               disabled={isLoading}
             >
               {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 text-white mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Sign up
-                </span>
-              ) : (
-                'Sign up'
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                        Creating Account...
+                      </>
+                    ) : (
+                      <>
+                        <User className="h-5 w-5" />
+                        Create Account
+                      </>
               )}
             </Button>
           </form>
         ) : (
           // OTP Verification Form
           <form onSubmit={handleOtpVerification} className="space-y-6">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Mail className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2">Verify Your Email</h2>
+                    <p className="text-gray-600 text-sm">We've sent a verification code to {signup.email}</p>
+                  </div>
+
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Enter OTP</label>
-              <div className="relative">
+                    <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      Verification Code
+                    </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400 text-center text-lg font-mono"
                   value={otp}
                   onChange={e => setOtp(e.target.value)}
+                      placeholder="Enter 6-digit code"
                   required
                   disabled={isLoading}
-                  placeholder="Enter the OTP sent to your email"
+                      maxLength={6}
                 />
               </div>
-            </div>
-            <div className="text-right">
+
+                  <div className="space-y-4">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      className="w-full py-3 text-base font-semibold flex items-center justify-center gap-2"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                          Verifying...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-5 w-5" />
+                          Verify Email
+                        </>
+                      )}
+                    </Button>
+
               <Button
                 type="button"
                 onClick={handleResendOtp}
                 disabled={isLoading}
                 variant="secondary"
-                className="w-full flex items-center justify-center mt-4"
+                      className="w-full py-3 text-base font-medium"
               >
-                Resend OTP
+                      Resend Verification Code
               </Button>
             </div>
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-full flex items-center justify-center"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 text-white mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Verify OTP
-                </span>
-              ) : (
-                'Verify OTP'
+                </form>
               )}
-            </Button>
-          </form>
-        )}
 
-        <p className="text-center text-gray-600 text-sm mt-6">
-          Already have an account? <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">Login</Link>
-        </p>
+              {/* Footer */}
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <p className="text-center text-gray-600 text-sm">
+                  Already have an account?{' '}
+                  <Link 
+                    to="/login" 
+                    className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, Globe, MapPin, CheckCircle, Users, Briefcase, Award, ChevronRight, Star, DollarSign, Calendar } from "lucide-react"
-import team1 from '../assets/aashish.jpeg'
-import team2 from '../assets/our team 2.jpeg'
-import team3 from '../assets/roshan kc.jpg'
-import team4 from '../assets/teammem.jpeg'
-// Import the getJobs function from your apiService
-import { getJobs, getCategoriesWithCount } from '../api/apiService';
-import GoogleMap from '../components/GoogleMap'; // Import GoogleMap
+import {
+  Phone,
+  Mail,
+  Globe,
+  MapPin,
+  CheckCircle,
+  Users,
+  Briefcase,
+  Award,
+  ChevronRight,
+  Star,
+  DollarSign,
+  Calendar,
+  ChevronLeft,
+} from 'lucide-react';
 
-// Import the new TrendingJobs component
-// import TrendingJobs from '../components/TrendingJobs'; // Removing this import
+import team1 from '../assets/aashish.jpeg';
+import team2 from '../assets/our team 2.jpeg';
+import team3 from '../assets/roshan kc.jpg';
+import team4 from '../assets/teammem.jpeg';
+
+import { getJobs, getCategoriesWithCount } from '../api/apiService';
+import GoogleMap from '../components/GoogleMap';
+import Button from '../components/Button';
 
 // Replace Next.js Image with regular img tag
 const Image = ({ src, alt, width, height, className, fill }) => {
@@ -34,8 +47,6 @@ const Image = ({ src, alt, width, height, className, fill }) => {
   );
 };
 
-import Button from '../components/Button'; // Import the reusable Button component
-
 // Utility function to strip HTML tags from a string (copied from JobsPage.jsx)
 function stripHtml(html) {
   const div = document.createElement('div');
@@ -43,13 +54,23 @@ function stripHtml(html) {
   return div.textContent || div.innerText || '';
 }
 
-// Define a few background colors to cycle through for visual variety
-const cardBackgroundColors = [
-  'bg-green-100', // Similar to the first card in the image
-  'bg-blue-100',  // Similar to the second and third cards
-  'bg-purple-100',
-  'bg-yellow-100',
-];
+// Utility function to format date
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+// Utility function to check if job is closed
+function isJobClosed(job) {
+  const deadlineDate = new Date(job.deadline);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return !job.is_active || deadlineDate < today;
+}
 
 export default function HomePage() {
   // Reinstate state and effect for trending jobs
@@ -60,20 +81,16 @@ export default function HomePage() {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [errorCategories, setErrorCategories] = useState(null);
+  const [currentJobIndex, setCurrentJobIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTrendingJobs = async () => {
       try {
         const data = await getJobs();
-        // Filter active jobs and take the first 4
-        const activeJobs = data.filter(job => {
-           const deadlineDate = new Date(job.deadline);
-           const today = new Date();
-           today.setHours(0, 0, 0, 0);
-           return job.is_active && deadlineDate >= today;
-        });
-        setTrendingJobs(activeJobs.slice(0, 3));
+        // Filter only active jobs and take the first 6 for carousel
+        const activeJobs = data.filter(job => !isJobClosed(job));
+        setTrendingJobs(activeJobs.slice(0, 6));
       } catch (err) {
         setErrorTrending(err.message);
       } finally {
@@ -105,21 +122,37 @@ export default function HomePage() {
     navigate(`/jobs/${jobId}`);
   };
 
+  const nextJob = () => {
+    setCurrentJobIndex((prevIndex) => 
+      prevIndex === trendingJobs.length - 3 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevJob = () => {
+    setCurrentJobIndex((prevIndex) => 
+      prevIndex === 0 ? trendingJobs.length - 3 : prevIndex - 1
+    );
+  };
+
+  const getVisibleJobs = () => {
+    if (trendingJobs.length <= 3) return trendingJobs;
+    return trendingJobs.slice(currentJobIndex, currentJobIndex + 3);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden">
+      <section className="bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 pt-16 md:pt-20 pb-12 md:pb-16">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center relative z-10">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="space-y-6 md:space-y-8">
               <div>
-                <h1 className="text-[40px] font-bold text-slate-900 leading-tight hero-animate">
+                <h1 className="text-[40px] font-bold text-gray-900 leading-tight">
                   Empowering <span className="text-blue-600">Global Talent</span>
                 </h1>
-                <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mt-4 hero-animate">Bridging Opportunities</h2>
+                <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mt-4">Bridging Opportunities</h2>
               </div>
-              <p className="text-xl text-slate-600 max-w-lg hero-animate">
+              <p className="text-xl text-gray-600 max-w-lg">
                 ZEN Career Hub is a premier human capital solutions provider headquartered in Dubai, connecting
                 skilled professionals with global opportunities.
               </p>
@@ -128,18 +161,10 @@ export default function HomePage() {
                   <Button to="/jobs" variant="primary">Explore Jobs</Button>
                 </Link>
               </div>
-              <div className="flex items-center gap-8 pt-4">
-               
-                <div className="text-slate-700">
-                  
-                </div>
-              </div>
             </div>
             
             <div className="relative">
-              <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full filter blur-3xl opacity-50"></div>
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-200 rounded-full filter blur-3xl opacity-50"></div>
-              <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="rounded-lg overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1653669486884-48b9938fe446?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D"
                   alt="ZEN Career Hub"
@@ -153,139 +178,143 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trending Jobs Section */}
-      <section className="py-12 md:py-16 bg-white">
+      {/* Featured Jobs Section */}
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Trending Jobs</h2>
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Featured Jobs</h2>
             <Link to="/jobs" className="text-blue-600 hover:underline flex items-center font-medium">
               See All Jobs <ChevronRight className="ml-1 w-5 h-5"/>
             </Link>
           </div>
 
-          {loadingTrending && <p className="text-center">Loading trending jobs...</p>}
-          {errorTrending && <p className="text-center text-red-500">Error loading trending jobs: {errorTrending}</p>}
+          {loadingTrending && <p className="text-center">Loading featured jobs...</p>}
+          {errorTrending && <p className="text-center text-red-500">Error loading featured jobs: {errorTrending}</p>}
           {!loadingTrending && !errorTrending && trendingJobs.length === 0 && (
-            <p className="text-center text-gray-600 text-lg">No trending jobs available at the moment.</p>
+            <p className="text-center text-gray-600 text-lg">No active jobs available at the moment.</p>
           )}
           {!loadingTrending && !errorTrending && trendingJobs.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-              {trendingJobs.map((job, index) => (
+            <div className="relative">
+              {/* Carousel Container */}
+              <div className="relative overflow-hidden">
+                <div className="flex gap-6 transition-transform duration-300 ease-in-out">
+                  {getVisibleJobs().map((job) => (
                 <div 
                   key={job.id} 
-                  className={`${cardBackgroundColors[index % cardBackgroundColors.length]} rounded-2xl p-6 relative overflow-hidden cursor-pointer`}
+                      className="bg-white rounded-lg p-6 border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors min-w-[calc(33.333%-1rem)] flex-shrink-0"
                   onClick={() => handleJobClick(job.id)}
                 >
-                   {/* Company Logo, Job Title, Company Name */}
-                   <div className="flex justify-between items-start mb-4">
-                     <div>
-                       <h3 className="text-xl font-semibold text-gray-800 mb-1">{job.job_title}</h3>
-                       <p className="text-gray-600 text-sm">{job.company.name}</p>
-                     </div>
-                    {/* Company Logo (Hidden for now) */}
-                    {/*
-                    {job.company.company_logo && (
-                       <img 
-                         src={job.company.company_logo}
-                         alt={job.company.name}
-                         className="w-16 h-16 object-contain ml-4 rounded-md"
-                       />
-                    )}
-                     */}
+                      {/* Job Title and Company */}
+                      <div className="mb-4">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">{job.job_title}</h3>
+                        <p className="text-gray-600 text-sm font-medium">{job.company.name}</p>
                   </div>
 
                   {/* Job Description */}
                   <p className="text-gray-700 text-sm mb-4 leading-relaxed line-clamp-3">{stripHtml(job.job_description)}</p>
 
-                  {/* Job Details */}
-                  <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
-                    <span className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1 text-blue-500"/>
-                      {job.company.location}
-                    </span>
-                    <span className="flex items-center">
-                      <Briefcase className="w-4 h-4 mr-1 text-blue-500"/>
-                      {job.job_type === 'full_time' ? 'Full Time' : 
-                       job.job_type === 'part_time' ? 'Part Time' : 
-                       job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
-                    </span>
-                    <span className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1 text-blue-500"/>
-                      Deadline: {formatDate(job.deadline)}
-                    </span>
+                      {/* Job Details */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2 text-blue-500"/>
+                      <span>{job.company.location}</span>
+                    </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Briefcase className="w-4 h-4 mr-2 text-blue-500"/>
+                          <span>
+                            {job.job_type === 'full_time' ? 'Full Time' : 
+                             job.job_type === 'part_time' ? 'Part Time' : 
+                             job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2 text-blue-500"/>
+                          <span>Deadline: {formatDate(job.deadline)}</span>
+                    </div>
                   </div>
 
                   {/* Salary and Apply Button */}
-                  <div className="flex justify-between items-center mt-4">
+                      <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                     <div>
-                      <span className="text-xl font-bold text-gray-800 flex items-baseline">
+                          <span className="text-lg font-bold text-gray-800">
                         {job.salary_range}
-                        <span className="text-gray-600 text-sm ml-1">/mo</span>
-                      </span>
+                          </span>
+                         <span className="text-gray-600 text-sm ml-1">/mo</span>
                     </div>
-                    <Button
+                        <Button
                       onClick={(e) => {
-                        e.stopPropagation();
-                        handleJobClick(job.id);
+                            e.stopPropagation();
+                         handleJobClick(job.id);
                       }}
-                      variant="secondary"
-                      className="transition-colors duration-200 shadow-sm"
+                          variant="secondary"
+                          className="transition-colors duration-200"
                     >
-                      Apply Now
-                    </Button>
+                          Apply Now
+                        </Button>
+                      </div>
                   </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Navigation Arrows */}
+              {trendingJobs.length > 3 && (
+                <>
+                  <button
+                    onClick={prevJob}
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white border border-gray-200 rounded-full p-2 shadow-md hover:shadow-lg transition-shadow"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={nextJob}
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white border border-gray-200 rounded-full p-2 shadow-md hover:shadow-lg transition-shadow"
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                  </button>
+                </>
+              )}
+
+              {/* Dots Indicator */}
+              {trendingJobs.length > 3 && (
+                <div className="flex justify-center mt-6 space-x-2">
+                  {Array.from({ length: Math.ceil(trendingJobs.length / 3) }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentJobIndex(i * 3)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        currentJobIndex === i * 3 ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
       </section>
-
-    
-
-      {/* <section className="py-12 bg-white border-y border-slate-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h3 className="text-slate-500 font-medium">Trusted by leading companies worldwide</h3>
-          </div>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="grayscale hover:grayscale-0 transition-all duration-300">
-                <Image
-                  src={`https://placehold.co/200x80/e2e8f0/64748b?text=Partner+${i}`}
-                  alt={`Partner ${i}`}
-                  width={200}
-                  height={80}
-                  className="h-12 w-auto object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       {/* About Section with Stats */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <div className="absolute top-1/4 -left-5 w-72 h-72 bg-blue-50 rounded-full filter blur-3xl opacity-70 z-0"></div>
-              <div className="grid grid-cols-2 gap-4 relative z-10">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <Image
                     src="https://images.unsplash.com/photo-1653669486775-75ddc200933c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D"
                     alt="Team"
                     width={600}
                     height={800}
-                    className="rounded-2xl shadow-lg h-80 object-cover"
+                    className="rounded-lg h-80 object-cover"
                   />
                   <Image
                     src="https://images.unsplash.com/photo-1653669486789-72a1124a0a26?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDJ8fHxlbnwwfHx8fHw%3D"
                     alt="Team"
                     width={600}
                     height={800}
-                    className="rounded-2xl shadow-lg h-80 object-cover"
+                    className="rounded-lg h-80 object-cover"
                   />
                 </div>
                 <div className="space-y-4 pt-8">
@@ -294,14 +323,14 @@ export default function HomePage() {
                     alt="Team"
                     width={600}
                     height={800}
-                    className="rounded-2xl shadow-lg h-80 object-cover"
+                    className="rounded-lg h-80 object-cover"
                   />
                   <Image
                     src="https://images.unsplash.com/photo-1653669486817-72a1124a0a28?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDR8fHxlbnwwfHx8fHw%3D"
                     alt="Team"
                     width={600}
                     height={800}
-                    className="rounded-2xl shadow-lg h-80 object-cover"
+                    className="rounded-lg h-80 object-cover"
                   />
                 </div>
               </div>
@@ -342,55 +371,38 @@ export default function HomePage() {
       </section>
 
       {/* Vision & Mission */}
-      <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Vision & Mission</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto"></div>
           </div>
           <div className="grid md:grid-cols-2 gap-12">
-            <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 relative overflow-hidden flex flex-col h-full">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50"></div>
-              <div className="relative z-10 flex flex-col flex-grow">
-                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
-                  <Image
-                    src="https://placehold.co/200/2563eb/ffffff?text=V"
-                    alt="Vision"
-                    width={40}
-                    height={40}
-                    className="rounded-lg"
-                  />
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <span className="text-2xl font-bold text-blue-600">V</span>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-slate-900">Our Vision</h3>
-                <p className="text-[19px] leading-[19.2px] text-slate-600 mb-4">
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Our Vision</h3>
+              <p className="text-[19px] leading-[19.2px] text-gray-600 mb-4">
                   To be a globally recognized HR consultancy that empowers individuals and organizations through
                   innovative and ethical talent solutions.
                 </p>
-                <div className="mt-auto">
+              <div className="mt-6">
                   <Image
                     src="https://images.unsplash.com/photo-1653669486884-48b9938fe446?w=800&auto=format&fit=crop&q=60"
                     alt="Vision Image"
                     width={800}
                     height={320}
-                    className="rounded-xl shadow-md w-full h-80 object-cover"
+                  className="rounded-lg w-full h-80 object-cover"
                   />
-                </div>
               </div>
             </div>
-            <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 relative overflow-hidden flex flex-col h-full">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full opacity-50"></div>
-              <div className="relative z-10 flex flex-col flex-grow">
-                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
-                  <Image
-                    src="https://placehold.co/200/2563eb/ffffff?text=M"
-                    alt="Mission"
-                    width={40}
-                    height={40}
-                    className="rounded-lg"
-                  />
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <span className="text-2xl font-bold text-blue-600">M</span>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-slate-900">Our Mission</h3>
-                <ul className="space-y-4 text-slate-600 mb-4">
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Our Mission</h3>
+              <ul className="space-y-4 text-gray-600 mb-4">
                   <li className="flex items-start">
                     <CheckCircle className="h-6 w-6 text-blue-500 mr-2 flex-shrink-0 mt-1" />
                     <p className="text-base leading-relaxed text-gray-900">
@@ -413,15 +425,14 @@ export default function HomePage() {
                     </p>
                   </li>
                 </ul>
-                <div className="mt-auto">
+              <div className="mt-6">
                   <Image
                     src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=60"
                     alt="Mission Image"
                     width={800}
                     height={320}
-                    className="rounded-xl shadow-md w-full h-80 object-cover"
+                  className="rounded-lg w-full h-80 object-cover"
                   />
-                </div>
               </div>
             </div>
           </div>
@@ -447,7 +458,7 @@ export default function HomePage() {
           {!loadingCategories && !errorCategories && categories.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
               {categories.map(category => (
-                <div key={category.id} className="bg-blue-50 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div key={category.id} className="bg-blue-50 rounded-lg p-6 text-center border border-blue-200">
                   <h3 className="text-xl font-semibold text-blue-700 mb-2">{category.name}</h3>
                   <p className="text-gray-600">{category.job_count} Jobs Available</p>
                 </div>
@@ -460,7 +471,7 @@ export default function HomePage() {
       {/* Services */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Services</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
             <p className="text-[19px] leading-[19.2px] text-gray-900 max-w-3xl mx-auto mb-10">
@@ -469,32 +480,32 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-blue-400" />
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Users className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Talent Acquisition</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Talent Acquisition</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 We connect employers with qualified candidates across various industries, ensuring a perfect fit for roles in the Gulf region and beyond.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <Globe className="h-8 w-8 text-blue-400" />
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Globe className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Global Network</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Global Network</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 Our extensive network spans multiple countries, providing access to diverse talent pools and comprehensive HR solutions.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="h-8 w-8 text-blue-400" />
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <CheckCircle className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Proven Results</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Proven Results</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 Our track record of successful placements and satisfied clients speaks to our effectiveness and reliability.
               </p>
             </div>
@@ -503,72 +514,70 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-300 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-[28px] font-medium mb-2 leading-[33.6px]">Why Choose ZEN Career Hub?</h2>
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
+          <div className="text-center mb-12">
+            <h2 className="text-[28px] font-medium mb-2 leading-[33.6px] text-gray-900">Why Choose ZEN Career Hub?</h2>
             <div className="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
           </div>
 
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <MapPin className="h-8 w-8 text-blue-400" />
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <MapPin className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Strategic Location</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Strategic Location</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 Situated in Dubai, a global business hub, we are ideally positioned to serve a diverse clientele.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <Globe className="h-8 w-8 text-blue-400" />
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Globe className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Global Network</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Global Network</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 Our partnership with Zen Edu Hub in Nepal and connections across South Asia expand our talent pool.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <Briefcase className="h-8 w-8 text-blue-400" />
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Briefcase className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Customized Solutions</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Customized Solutions</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 We tailor our services to meet the specific needs of each client, ensuring optimal outcomes.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <Award className="h-8 w-8 text-blue-400" />
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Award className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Ethical Practices</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Ethical Practices</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 We adhere to the highest ethical standards, ensuring transparency and integrity in all our operations.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <Users className="h-8 w-8 text-blue-400" />
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <Users className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Experienced Leadership</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Experienced Leadership</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 Our leadership team brings a wealth of experience and insight into the HR and recruitment industry.
               </p>
             </div>
 
-            <div className="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle className="h-8 w-8 text-blue-400" />
+            <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                <CheckCircle className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold mb-4">Proven Results</h3>
-              <p className="text-base leading-relaxed text-slate-300">
+              <h3 className="text-xl font-bold mb-4 text-gray-900">Proven Results</h3>
+              <p className="text-base leading-relaxed text-gray-600">
                 Our track record of successful placements and satisfied clients speaks to our effectiveness and
                 reliability.
               </p>
@@ -578,7 +587,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-[#283588] text-white">
+      <section className="py-20 bg-blue-600 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="md:w-2/3">
@@ -598,7 +607,7 @@ export default function HomePage() {
       </section>
 
       {/* Our Team Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
           <div className="text-center mb-12">
             <h2 className="text-[28px] font-medium text-gray-900 mb-2 leading-[33.6px]">Our Team</h2>
@@ -609,41 +618,41 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             {/* Team Member 1 */}
-            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
-              <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-lg overflow-hidden border-2 border-gray-200">
                 <img src={team4} alt="Binod Timalsina" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-blue-900 mb-2">Binod Timalsina</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Binod Timalsina</h3>
               <p className="text-blue-600 font-medium mb-2">CEO & Founder</p>
               <p className="text-gray-600 text-sm">Leading ZEN Career Hub with vision and expertise in international recruitment.</p>
             </div>
 
             {/* Team Member 2 */}
-            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
-              <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-lg overflow-hidden border-2 border-gray-200">
                 <img src={team2} alt="Aashish Timalsina" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-blue-900 mb-2">Aashish Timalsina</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Aashish Timalsina</h3>
               <p className="text-blue-600 font-medium mb-2">Managing Director</p>
               <p className="text-gray-600 text-sm">Overseeing operations and strategic growth across all regions.</p>
             </div>
 
             {/* Team Member 3 */}
-            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
-              <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-lg overflow-hidden border-2 border-gray-200">
                 <img src={team3} alt="Roshan KC" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-blue-900 mb-2">Roshan KC</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Roshan KC</h3>
               <p className="text-blue-600 font-medium mb-2">Operations Manager</p>
               <p className="text-gray-600 text-sm">Ensuring smooth operations and exceptional client service delivery.</p>
             </div>
 
             {/* Team Member 4 */}
-            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl">
-              <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-200 shadow">
+            <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-lg overflow-hidden border-2 border-gray-200">
                 <img src={team1} alt="Team Member" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-xl font-bold text-blue-900 mb-2">Dedicated Team</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Dedicated Team</h3>
               <p className="text-blue-600 font-medium mb-2">HR Professionals</p>
               <p className="text-gray-600 text-sm">Our experienced team of HR professionals committed to excellence.</p>
             </div>
@@ -671,7 +680,7 @@ export default function HomePage() {
               
               <div className="space-y-6">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <Phone className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
@@ -682,7 +691,7 @@ export default function HomePage() {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <Mail className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
@@ -692,7 +701,7 @@ export default function HomePage() {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <MapPin className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>

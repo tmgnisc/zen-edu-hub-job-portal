@@ -9,28 +9,28 @@ const ContactForm = ({ ButtonComponent }) => {
     message: '',
     howHear: '',
   });
-  
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.message.trim()) {
       newErrors.message = 'Message is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -38,7 +38,7 @@ const ContactForm = ({ ButtonComponent }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -47,10 +47,10 @@ const ContactForm = ({ ButtonComponent }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (validate()) {
       setIsSubmitting(true);
-      
+
       // Simulate API call
       setTimeout(() => {
         setIsSubmitting(false);
@@ -62,7 +62,7 @@ const ContactForm = ({ ButtonComponent }) => {
           message: '',
           howHear: '',
         });
-        
+
         // Reset success message after 5 seconds
         setTimeout(() => {
           setSubmitted(false);
@@ -80,7 +80,7 @@ const ContactForm = ({ ButtonComponent }) => {
           Thank you for your message! We'll get back to you soon.
         </div>
       )}
-      
+
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
           Full Name <span className="text-red-500">*</span>
@@ -98,7 +98,7 @@ const ContactForm = ({ ButtonComponent }) => {
         />
         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
       </div>
-      
+
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
           Email Address <span className="text-red-500">*</span>
@@ -116,7 +116,7 @@ const ContactForm = ({ ButtonComponent }) => {
         />
         {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
       </div>
-      
+
       <div>
         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
           Phone Number (optional)
@@ -131,7 +131,7 @@ const ContactForm = ({ ButtonComponent }) => {
           placeholder="+971 50 123 4567"
         />
       </div>
-      
+
       <div>
         <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
           Message <span className="text-red-500">*</span>
@@ -149,7 +149,7 @@ const ContactForm = ({ ButtonComponent }) => {
         />
         {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
       </div>
-      
+
       <div>
         <label htmlFor="howHear" className="block text-sm font-medium text-gray-700 mb-1">
           How did you hear about us? (optional)
@@ -173,9 +173,25 @@ const ContactForm = ({ ButtonComponent }) => {
       >
         {isSubmitting ? (
           <>
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
             Sending...
           </>

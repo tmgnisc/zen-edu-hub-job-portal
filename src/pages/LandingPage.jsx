@@ -1,13 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  MapPin,
+  Briefcase,
+  ChevronDown,
+  Search,
+  User,
+  FileText,
+  Building2,
+  GraduationCap,
+  Code2,
+  LineChart,
+  Rocket,
+  Target,
+  Megaphone,
+  PenTool,
+  DollarSign,
+  Cog,
+  Headphones,
+  Users,
+  Home,
+  Wrench,
+  Calendar,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import { FaBriefcase } from 'react-icons/fa';
+import gsap from 'gsap';
+
 import Navbar from '../components/Navbar/Navbar';
 import Button from '../components/Button';
 import { getJobs, getCategoriesWithCount } from '../api/apiService';
-import { useNavigate } from 'react-router-dom';
-import { MapPin, Briefcase, ChevronDown, Search, User, FileText, Building2, GraduationCap, Code2, LineChart, Rocket, Target, Megaphone, PenTool, DollarSign, Cog, Headphones, Users, Home, Wrench, Calendar, Star } from 'lucide-react';
-import { FaBriefcase } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-
-import gsap from 'gsap';
 
 // Utility to strip HTML tags
 function stripHtml(html) {
@@ -19,10 +43,10 @@ function stripHtml(html) {
 // Utility function to format date
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   });
 }
 
@@ -33,13 +57,6 @@ function isJobClosed(job) {
   today.setHours(0, 0, 0, 0);
   return !job.is_active || deadlineDate < today;
 }
-
-const cardBackgroundColors = [
-  'bg-green-100',
-  'bg-blue-100',
-  'bg-purple-100',
-  'bg-yellow-100',
-];
 
 const categoriesData = [
   { name: 'Marketing', icon: Megaphone, bgColor: 'bg-blue-50', textColor: 'text-blue-700' },
@@ -56,12 +73,13 @@ export default function LandingPage() {
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
-  const [trendingJobs, setTrendingJobs] = useState([]);
-  const [loadingTrending, setLoadingTrending] = useState(true);
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [_trendingJobs, setTrendingJobs] = useState([]);
+  const [_loadingTrending, setLoadingTrending] = useState(true);
+  const [_categories, setCategories] = useState([]);
+  const [_loadingCategories, setLoadingCategories] = useState(true);
   const [featuredJobs, setFeaturedJobs] = useState([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
+  const [currentJobIndex, setCurrentJobIndex] = useState(0);
   const navigate = useNavigate();
   const heroRef = useRef(null);
   const stepsRef = useRef([]);
@@ -92,8 +110,9 @@ export default function LandingPage() {
     const fetchFeaturedJobs = async () => {
       try {
         const data = await getJobs();
-        const featured = data.filter(job => job.featured === true);
-        setFeaturedJobs(featured.slice(0, 6)); // Show max 6 featured jobs
+        // Filter only active jobs and take the first 6 for carousel
+        const activeJobs = data.filter(job => !isJobClosed(job));
+        setFeaturedJobs(activeJobs.slice(0, 6));
       } finally {
         setLoadingFeatured(false);
       }
@@ -164,6 +183,23 @@ export default function LandingPage() {
 
   const handleJobClick = (jobId) => {
     navigate(`/jobs/${jobId}`);
+  };
+
+  const nextJob = () => {
+    setCurrentJobIndex((prevIndex) => 
+      prevIndex === featuredJobs.length - 3 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevJob = () => {
+    setCurrentJobIndex((prevIndex) => 
+      prevIndex === 0 ? featuredJobs.length - 3 : prevIndex - 1
+    );
+  };
+
+  const getVisibleJobs = () => {
+    if (featuredJobs.length <= 3) return featuredJobs;
+    return featuredJobs.slice(currentJobIndex, currentJobIndex + 3);
   };
 
   return (
@@ -241,7 +277,7 @@ export default function LandingPage() {
               <Star className="text-yellow-500 w-8 h-8 ml-3" />
             </div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Discover our handpicked featured opportunities from top companies
+              Discover our handpicked active opportunities from top companies
             </p>
           </div>
 
@@ -251,80 +287,104 @@ export default function LandingPage() {
             </div>
           ) : featuredJobs.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-gray-600">No featured jobs available at the moment.</p>
+              <p className="text-gray-600">No active jobs available at the moment.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {featuredJobs.map((job, index) => {
-                const isClosed = isJobClosed(job);
-                return (
-                  <div 
-                    key={job.id} 
-                    className={`${cardBackgroundColors[index % cardBackgroundColors.length]} p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 cursor-pointer relative ${isClosed ? 'opacity-75' : ''}`}
-                    onClick={() => handleJobClick(job.id)}
-                  >
-                    {/* Featured Badge */}
-                    <div className="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center">
-                      <Star className="w-3 h-3 mr-1" />
-                      Featured
-                    </div>
-
-                    {/* Status Badge */}
-                    {isClosed && (
-                      <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Closed
+            <div className="relative">
+              {/* Carousel Container */}
+              <div className="relative overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {getVisibleJobs().map((job) => (
+                    <div 
+                      key={job.id} 
+                      className="bg-white rounded-lg p-6 border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors shadow-sm hover:shadow-md"
+                      onClick={() => handleJobClick(job.id)}
+                    >
+                      {/* Job Title and Company */}
+                      <div className="mb-4">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">{job.job_title}</h3>
+                        <p className="text-gray-600 text-sm font-medium">{job.company.name}</p>
                       </div>
-                    )}
-                    
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">{job.job_title}</h3>
-                        <p className="font-semibold text-gray-700 text-sm mb-2">{job.company.name}</p>
-                        <div className="flex items-center text-sm text-gray-600 mb-2">
-                          <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+
+                      {/* Job Description */}
+                      <p className="text-gray-700 text-sm mb-4 leading-relaxed line-clamp-3">{stripHtml(job.job_description)}</p>
+
+                      {/* Job Details */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2 text-blue-500"/>
                           <span>{job.company.location}</span>
                         </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Briefcase className="w-4 h-4 mr-2 text-blue-500"/>
+                          <span>
+                            {job.job_type === 'full_time' ? 'Full Time' : 
+                             job.job_type === 'part_time' ? 'Part Time' : 
+                             job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2 text-blue-500"/>
+                          <span>Deadline: {formatDate(job.deadline)}</span>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <p className="text-gray-600 mb-4 line-clamp-3 text-sm">{stripHtml(job.job_description)}</p>
-                    
-                    <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-4">
-                      <span className="flex items-center">
-                        <Briefcase className="w-4 h-4 mr-1 text-blue-500" />
-                        {job.job_schedule === 'full_time' ? 'Full Time' : 
-                         job.job_schedule === 'part_time' ? 'Part Time' : 
-                         job.job_schedule ? job.job_schedule.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
-                      </span>
-                      <span className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1 text-blue-500" />
-                        {formatDate(job.deadline)}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-lg font-bold text-gray-800">
-                          {job.salary_range}
-                        </span>
-                      </div>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (!isClosed) {
+
+                      {/* Salary and Apply Button */}
+                      <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                        <div>
+                          <span className="text-lg font-bold text-gray-800">
+                            {job.salary_range}
+                          </span>
+                          <span className="text-gray-600 text-sm ml-1">/mo</span>
+                        </div>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
                             handleJobClick(job.id);
-                          }
-                        }}
-                        variant={isClosed ? "disabled" : "secondary"}
-                        className={`transition-colors duration-200 ${isClosed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={isClosed}
-                      >
-                        {isClosed ? 'Closed' : 'Apply Now'}
-                      </Button>
+                          }}
+                          variant="secondary"
+                          className="transition-colors duration-200"
+                        >
+                          Apply Now
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Arrows */}
+              {featuredJobs.length > 3 && (
+                <>
+                  <button
+                    onClick={prevJob}
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white border border-gray-200 rounded-full p-2 shadow-md hover:shadow-lg transition-shadow"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={nextJob}
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white border border-gray-200 rounded-full p-2 shadow-md hover:shadow-lg transition-shadow"
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                  </button>
+                </>
+              )}
+
+              {/* Dots Indicator */}
+              {featuredJobs.length > 3 && (
+                <div className="flex justify-center mt-6 space-x-2">
+                  {Array.from({ length: Math.ceil(featuredJobs.length / 3) }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentJobIndex(i * 3)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        currentJobIndex === i * 3 ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -337,6 +397,111 @@ export default function LandingPage() {
               </Link>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* New Design Section - Looking for a Job */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Images and Candidate Card */}
+            <div className="relative">
+              {/* Stacked Images */}
+              <div className="relative">
+                {/* Top Image Card */}
+                <div className="relative mb-6">
+                  <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-lg">
+                    <img 
+                      src="https://images.unsplash.com/photo-1653669486884-48b9938fe446?w=800&auto=format&fit=crop&q=60" 
+                      alt="Woman with laptop" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {/* Notification Card */}
+                  {/* <div className="absolute -bottom-3 -right-3 bg-white rounded-xl shadow-lg p-3 border border-gray-100">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <svg className="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      </div>
+                      <div className="text-xs">
+                        <p className="font-medium text-gray-800">Work Inquiry</p>
+                        <p className="text-gray-600">From Ali Tufan</p>
+                      </div>
+                    </div>
+                  </div> */}
+                </div>
+
+                {/* Bottom Image Card */}
+                <div className="relative ml-8">
+                  <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-lg">
+                    <img 
+                      src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=60" 
+                      alt="Man with cap" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* 10k+ Candidates Card - Overlapping */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">10k+ Candidates</h3>
+                  <div className="flex items-center space-x-2">
+                    {/* Profile Pictures */}
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-white"></div>
+                      <div className="w-8 h-8 rounded-full bg-green-500 border-2 border-white"></div>
+                      <div className="w-8 h-8 rounded-full bg-purple-500 border-2 border-white"></div>
+                      <div className="w-8 h-8 rounded-full bg-yellow-500 border-2 border-white"></div>
+                      <div className="w-8 h-8 rounded-full bg-red-500 border-2 border-white"></div>
+                    </div>
+                    {/* Plus Circle */}
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Large Image and Search Section */}
+            <div className="relative">
+              {/* Large Image */}
+              <div className="relative mb-8">
+                <div className="w-full h-96 rounded-2xl overflow-hidden shadow-lg">
+                  <img 
+                    src="https://images.unsplash.com/photo-1653669486884-48b9938fe446?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D" 
+                    alt="Woman looking up" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Search Section */}
+              <div className="text-center lg:text-left">
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                  Looking for a job?
+                </h2>
+                <p className="text-lg text-gray-600 mb-8 max-w-md">
+                  Search all the open positions. Get your own personalized salary estimate.
+                </p>
+                <Button 
+                  onClick={() => navigate('/jobs')} 
+                  variant="primary" 
+                  className="px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-shadow flex items-center space-x-2 mx-auto lg:mx-0"
+                >
+                  <span>Search a job</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7H7" />
+                  </svg>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

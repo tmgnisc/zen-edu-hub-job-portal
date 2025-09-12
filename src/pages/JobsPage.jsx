@@ -4,13 +4,7 @@ import { MapPin, Briefcase, DollarSign, Calendar, Clock } from 'lucide-react';
 import Button from '../components/Button';
 import { getJobs } from '../api/apiService';
 
-// Define background colors for visual variety
-const cardBackgroundColors = [
-  'bg-green-100',
-  'bg-blue-100',
-  'bg-purple-100',
-  'bg-yellow-100',
-];
+// Remove the background colors array - we'll use consistent white cards
 
 // Utility function to strip HTML tags from a string
 function stripHtml(html) {
@@ -226,7 +220,7 @@ const JobsPage = ({ isComponent = false }) => {
               return (
                 <div 
                   key={job.id} 
-                  className={`${cardBackgroundColors[index % cardBackgroundColors.length]} p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-blue-100 cursor-pointer relative ${isClosed ? 'opacity-75' : ''}`}
+                  className="bg-white rounded-lg p-6 border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors shadow-sm hover:shadow-md relative"
                   onClick={() => handleJobClick(job.id)}
                 >
                   {/* Status Badge */}
@@ -236,43 +230,43 @@ const JobsPage = ({ isComponent = false }) => {
                     </div>
                   )}
                   
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="text-xl font-semibold mb-1 text-blue-600">{job.job_title}</h4>
-                      <h5 className="font-semibold text-slate-900 text-sm flex items-center">{job.company.name}</h5>
+                  <div className="mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">{job.job_title}</h3>
+                    <p className="text-gray-600 text-sm font-medium">{job.company.name}</p>
+                  </div>
+                  
+                  <p className="text-gray-700 text-sm mb-4 leading-relaxed line-clamp-3">{stripHtml(job.job_description)}</p>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <MapPin className="w-4 h-4 mr-2 text-blue-500"/>
+                      <span>{job.company.location}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Briefcase className="w-4 h-4 mr-2 text-blue-500"/>
+                      <span>
+                        {job.job_type === 'full_time' ? 'Full Time' : 
+                         job.job_type === 'part_time' ? 'Part Time' : 
+                         job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Calendar className="w-4 h-4 mr-2 text-blue-500"/>
+                      <span>Deadline: {formatDate(job.deadline)}</span>
                     </div>
                   </div>
                   
-                  <p className="text-slate-600 mb-4 line-clamp-3 text-sm">{stripHtml(job.job_description)}</p>
-                  
-                  <div className="flex flex-wrap gap-3 text-sm text-slate-600 mb-4">
-                    <span className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1 text-blue-500"/>
-                      {job.company.location}
-                    </span>
-                    <span className="flex items-center">
-                      <Briefcase className="w-4 h-4 mr-1 text-blue-500"/>
-                      {job.job_type === 'full_time' ? 'Full Time' : 
-                       job.job_type === 'part_time' ? 'Part Time' : 
-                       job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
-                    </span>
-                    <span className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1 text-blue-500"/>
-                      Deadline: {formatDate(job.deadline)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center mt-4">
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                     <div>
-                      <span className="text-xl font-bold text-gray-800 flex items-baseline">
+                      <span className="text-lg font-bold text-gray-800">
                         {job.salary_range}
-                        <span className="text-gray-600 text-sm ml-1">/mo</span>
                       </span>
+                      <span className="text-gray-600 text-sm ml-1">/mo</span>
                     </div>
                     <Button
                       onClick={(e) => handleApplyClick(e, job.id, isClosed)}
                       variant={isClosed ? "disabled" : "secondary"}
-                      className={`transition-colors duration-200 shadow-sm ${isClosed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className="transition-colors duration-200"
                       disabled={isClosed}
                     >
                       {isClosed ? 'Closed' : 'Apply Now'}

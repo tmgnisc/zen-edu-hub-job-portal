@@ -193,7 +193,7 @@ const ProfilePage = () => {
     e.preventDefault();
     const token = sessionStorage.getItem('token');
     if (!token) return;
-  
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
@@ -350,10 +350,10 @@ const ProfilePage = () => {
       console.log('Content-Type:', contentType);
       
       if (contentType && contentType.includes('application/json')) {
-        try {
-          data = await response.json();
+      try {
+        data = await response.json();
           console.log('Server response:', data);
-        } catch (jsonError) {
+      } catch (jsonError) {
           console.error('Failed to parse JSON response:', jsonError);
           setLoading(false);
           return;
@@ -373,10 +373,10 @@ const ProfilePage = () => {
         setLoading(false);
         return;
       }
-  
+      
       if (response.ok) {
         await new Promise(resolve => setTimeout(resolve, 1000));
-  
+        
         // Update the user data in sessionStorage
         const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
         const updatedUser = {
@@ -385,10 +385,10 @@ const ProfilePage = () => {
           profile_picture: data.profile_picture || currentUser.profile_picture
         };
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
-  
+        
         // Dispatch profile update event
         window.dispatchEvent(new Event('profileUpdated'));
-  
+        
         toast.success('Profile updated successfully');
         setIsEditing(false);
         fetchProfile();
@@ -400,8 +400,8 @@ const ProfilePage = () => {
           if (data.errors) {
             const errors = {};
             Object.keys(data.errors).forEach(key => {
-              errors[key] = Array.isArray(data.errors[key])
-                ? data.errors[key][0]
+              errors[key] = Array.isArray(data.errors[key]) 
+                ? data.errors[key][0] 
                 : data.errors[key];
             });
             setFormErrors(errors);
@@ -669,11 +669,11 @@ const ProfilePage = () => {
                   <FaUser className="text-blue-600 mr-3" />
                   Personal Information
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {renderInputField('full_name', 'Full Name', 'text', <FaUser className="text-blue-600" />)}
+              <div className="grid md:grid-cols-2 gap-6">
+                {renderInputField('full_name', 'Full Name', 'text', <FaUser className="text-blue-600" />)}
                   {renderInputField('username', 'Username', 'text', <FaUser className="text-blue-600" />, true)}
                   {renderInputField('email', 'Email', 'email', <FaEnvelope className="text-blue-600" />, true)}
-                  {renderInputField('phone_number', 'Phone Number', 'tel', <FaPhone className="text-blue-600" />)}
+                {renderInputField('phone_number', 'Phone Number', 'tel', <FaPhone className="text-blue-600" />)}
                   {renderSelectField('gender', 'Gender', genderOptions, <FaVenusMars className="text-blue-600" />, genderLabels)}
                   {renderSelectField('marital_status', 'Marital Status', maritalStatusOptions, <FaRing className="text-blue-600" />, maritalStatusLabels)}
                 </div>
@@ -686,9 +686,9 @@ const ProfilePage = () => {
                   Location & Nationality
                 </h3>
                 <div className="grid md:grid-cols-2 gap-6">
-                  {renderInputField('nationality', 'Nationality', 'text', <FaGlobe className="text-blue-600" />)}
-                  {renderInputField('current_location', 'Current Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
-                  {renderInputField('preferred_job_location', 'Preferred Job Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
+                {renderInputField('nationality', 'Nationality', 'text', <FaGlobe className="text-blue-600" />)}
+                {renderInputField('current_location', 'Current Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
+                {renderInputField('preferred_job_location', 'Preferred Job Location', 'text', <FaMapMarkerAlt className="text-blue-600" />)}
                   {renderInputField('linkedin_url', 'LinkedIn URL', 'url', <FaGlobe className="text-blue-600" />)}
                 </div>
               </div>
@@ -701,7 +701,7 @@ const ProfilePage = () => {
                 </h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   {renderSelectField('highest_qualification', 'Highest Qualification', highestQualificationOptions, <FaGraduationCap className="text-blue-600" />, highestQualificationLabels)}
-                  {renderSelectField('years_of_experience', 'Years of Experience', experienceLevels, <FaBriefcase className="text-blue-600" />)}
+                {renderSelectField('years_of_experience', 'Years of Experience', experienceLevels, <FaBriefcase className="text-blue-600" />)}
                   {renderInputField('certificate', 'Certificate', 'text', <FaCertificate className="text-blue-600" />)}
                   {renderInputField('preferred_designation', 'Preferred Designation', 'text', <FaBuilding className="text-blue-600" />)}
                 </div>
