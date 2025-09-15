@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Briefcase, DollarSign, Calendar, Clock } from 'lucide-react';
+import { MapPin, Briefcase, DollarSign, Calendar, Clock, Flame, Sparkles } from 'lucide-react';
 import Button from '../components/Button';
 import { getJobs } from '../api/apiService';
 
@@ -223,10 +223,22 @@ const JobsPage = ({ isComponent = false }) => {
                   className="bg-white rounded-lg p-6 border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors shadow-sm hover:shadow-md relative"
                   onClick={() => handleJobClick(job.id)}
                 >
-                  {/* Status Badge */}
-                  {isClosed && (
+                  {/* Status / Hot Badge (top-right) */}
+                  {isClosed ? (
                     <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       Closed
+                    </div>
+                  ) : (
+                    job.is_hot_job && (
+                      <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1">
+                        <Flame className="w-3 h-3" /> Hot
+                      </div>
+                    )
+                  )}
+                  {/* New badge (top-left) */}
+                  {!isClosed && job.is_new_job && (
+                    <div className="absolute top-4 left-4 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> New
                     </div>
                   )}
                   
@@ -249,6 +261,10 @@ const JobsPage = ({ isComponent = false }) => {
                          job.job_type === 'part_time' ? 'Part Time' : 
                          job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
                       </span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Clock className="w-4 h-4 mr-2 text-blue-500"/>
+                      <span>Published: {formatDate(job.created_at)}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <Calendar className="w-4 h-4 mr-2 text-blue-500"/>

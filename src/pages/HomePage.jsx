@@ -13,6 +13,7 @@ import {
   Star,
   DollarSign,
   Calendar,
+  Clock,
   ChevronLeft,
 } from 'lucide-react';
 
@@ -24,6 +25,8 @@ import team4 from '../assets/teammem.jpeg';
 import { getJobs, getCategoriesWithCount } from '../api/apiService';
 import GoogleMap from '../components/GoogleMap';
 import Button from '../components/Button';
+import SearchBar from '../components/SearchBar';
+import SearchResults from '../components/SearchResults';
 
 // Replace Next.js Image with regular img tag
 const Image = ({ src, alt, width, height, className, fill }) => {
@@ -84,10 +87,18 @@ export default function HomePage() {
   const [currentJobIndex, setCurrentJobIndex] = useState(0);
   const navigate = useNavigate();
 
+  // Search functionality state
+  const [allJobs, setAllJobs] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
   useEffect(() => {
     const fetchTrendingJobs = async () => {
       try {
         const data = await getJobs();
+        setAllJobs(data); // Store all jobs for search functionality
         // Filter only active jobs and take the first 6 for carousel
         const activeJobs = data.filter(job => !isJobClosed(job));
         setTrendingJobs(activeJobs.slice(0, 6));
@@ -139,9 +150,66 @@ export default function HomePage() {
     return trendingJobs.slice(currentJobIndex, currentJobIndex + 3);
   };
 
+  // Search functionality
+  const handleSearch = async ({ search, location, category }) => {
+    setIsSearching(true);
+    setSearchTerm({ search, location, category });
+    
+    try {
+      // Filter jobs based on search criteria
+      let filtered = [...allJobs];
+
+      if (search && search.trim()) {
+        const searchLower = search.toLowerCase();
+        filtered = filtered.filter(job =>
+          job.job_title.toLowerCase().includes(searchLower) ||
+          job.company.name.toLowerCase().includes(searchLower) ||
+          job.job_description.toLowerCase().includes(searchLower) ||
+          job.job_category.name.toLowerCase().includes(searchLower)
+        );
+      }
+
+      if (location && location.trim()) {
+        const locationLower = location.toLowerCase();
+        filtered = filtered.filter(job =>
+          job.company.location.toLowerCase().includes(locationLower)
+        );
+      }
+
+      if (category && category.trim()) {
+        filtered = filtered.filter(job =>
+          job.job_category.name === category
+        );
+      }
+
+      // Sort: active jobs first, then closed jobs
+      filtered.sort((a, b) => {
+        const aIsClosed = isJobClosed(a);
+        const bIsClosed = isJobClosed(b);
+        
+        if (aIsClosed && !bIsClosed) return 1;
+        if (!aIsClosed && bIsClosed) return -1;
+        return 0;
+      });
+
+      setSearchResults(filtered);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchResults([]);
+    setSearchTerm(null);
+    setShowSearchResults(false);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Section with Search */}
       <section className="bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20 pt-16 md:pt-20 pb-12 md:pb-16">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
@@ -178,6 +246,36 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Search Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Your Perfect Job</h2>
+            <p className="text-lg text-gray-600">Search through thousands of opportunities</p>
+          </div>
+          <SearchBar 
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+            searchResults={searchResults}
+            isSearching={isSearching}
+            searchTerm={searchTerm}
+          />
+        </div>
+      </section>
+
+      {/* Search Results */}
+      {showSearchResults && (
+        <section className="py-12 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
+            <SearchResults 
+              jobs={searchResults}
+              loading={isSearching}
+              error={null}
+            />
+          </div>
+        </section>
+      )}
+
       {/* Featured Jobs Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
@@ -202,13 +300,28 @@ export default function HomePage() {
                   {getVisibleJobs().map((job) => (
                 <div 
                   key={job.id} 
-                      className="bg-white rounded-lg p-6 border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors min-w-[calc(33.333%-1rem)] flex-shrink-0"
+                      className="bg-white rounded-lg p-6 border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors min-w-[calc(33.333%-1rem)] flex-shrink-0 relative"
                   onClick={() => handleJobClick(job.id)}
                 >
-                      {/* Job Title and Company */}
-                      <div className="mb-4">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">{job.job_title}</h3>
-                        <p className="text-gray-600 text-sm font-medium">{job.company.name}</p>
+                  {/* New / Hot badges */}
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex gap-2">
+                      {job.is_new_job && (
+                        <span className="inline-flex items-center gap-1 bg-green-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                          New
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500">Published {formatDate(job.created_at)}</div>
+                  </div>
+                  {/* Hot badge top-right mimic closed position in JobsPage not applicable here due to layout; keep inline above */}
+                  {job.is_hot_job && (
+                    <span className="absolute top-4 right-4 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-semibold">Hot</span>
+                  )}
+                  {/* Job Title and Company */}
+                  <div className="mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">{job.job_title}</h3>
+                    <p className="text-gray-600 text-sm font-medium">{job.company.name}</p>
                   </div>
 
                   {/* Job Description */}
@@ -227,6 +340,10 @@ export default function HomePage() {
                              job.job_type === 'part_time' ? 'Part Time' : 
                              job.job_type ? job.job_type.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Not Specified'}
                           </span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Clock className="w-4 h-4 mr-2 text-blue-500"/>
+                          <span>Published: {formatDate(job.created_at)}</span>
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
                           <Calendar className="w-4 h-4 mr-2 text-blue-500"/>

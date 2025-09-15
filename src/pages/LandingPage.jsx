@@ -31,6 +31,8 @@ import gsap from 'gsap';
 
 import Navbar from '../components/Navbar/Navbar';
 import Button from '../components/Button';
+import SearchBar from '../components/SearchBar';
+import SearchResults from '../components/SearchResults';
 import { getJobs, getCategoriesWithCount } from '../api/apiService';
 
 // Utility to strip HTML tags
@@ -43,9 +45,9 @@ function stripHtml(html) {
 // Utility function to format date
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
+  return date.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
     day: 'numeric',
   });
 }
@@ -70,9 +72,6 @@ const categoriesData = [
 ];
 
 export default function LandingPage() {
-  const [search, setSearch] = useState('');
-  const [location, setLocation] = useState('');
-  const [category, setCategory] = useState('');
   const [_trendingJobs, setTrendingJobs] = useState([]);
   const [_loadingTrending, setLoadingTrending] = useState(true);
   const [_categories, setCategories] = useState([]);
@@ -81,6 +80,13 @@ export default function LandingPage() {
   const [loadingFeatured, setLoadingFeatured] = useState(true);
   const [currentJobIndex, setCurrentJobIndex] = useState(0);
   const navigate = useNavigate();
+
+  // Search functionality state
+  const [allJobs, setAllJobs] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const heroRef = useRef(null);
   const stepsRef = useRef([]);
   const teamRef = useRef([]);
@@ -110,6 +116,7 @@ export default function LandingPage() {
     const fetchFeaturedJobs = async () => {
       try {
         const data = await getJobs();
+        setAllJobs(data); // Store all jobs for search functionality
         // Filter only active jobs and take the first 6 for carousel
         const activeJobs = data.filter(job => !isJobClosed(job));
         setFeaturedJobs(activeJobs.slice(0, 6));
@@ -166,19 +173,61 @@ export default function LandingPage() {
     }
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const queryParams = new URLSearchParams();
-    if (search.trim()) {
-      queryParams.append('search', search.trim());
+  // Search functionality
+  const handleSearch = async ({ search, location, category }) => {
+    setIsSearching(true);
+    setSearchTerm({ search, location, category });
+    
+    try {
+      // Filter jobs based on search criteria
+      let filtered = [...allJobs];
+
+      if (search && search.trim()) {
+        const searchLower = search.toLowerCase();
+        filtered = filtered.filter(job =>
+          job.job_title.toLowerCase().includes(searchLower) ||
+          job.company.name.toLowerCase().includes(searchLower) ||
+          job.job_description.toLowerCase().includes(searchLower) ||
+          job.job_category.name.toLowerCase().includes(searchLower)
+        );
+      }
+
+      if (location && location.trim()) {
+        const locationLower = location.toLowerCase();
+        filtered = filtered.filter(job =>
+          job.company.location.toLowerCase().includes(locationLower)
+        );
+      }
+
+      if (category && category.trim()) {
+        filtered = filtered.filter(job =>
+          job.job_category.name === category
+        );
+      }
+
+      // Sort: active jobs first, then closed jobs
+      filtered.sort((a, b) => {
+        const aIsClosed = isJobClosed(a);
+        const bIsClosed = isJobClosed(b);
+        
+        if (aIsClosed && !bIsClosed) return 1;
+        if (!aIsClosed && bIsClosed) return -1;
+        return 0;
+      });
+
+      setSearchResults(filtered);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
     }
-    if (location.trim()) {
-      queryParams.append('location', location.trim());
-    }
-    if (category) {
-      queryParams.append('category', category);
-    }
-    navigate(`/jobs?${queryParams.toString()}`);
+  };
+
+  const handleClearSearch = () => {
+    setSearchResults([]);
+    setSearchTerm(null);
+    setShowSearchResults(false);
   };
 
   const handleJobClick = (jobId) => {
@@ -218,54 +267,28 @@ export default function LandingPage() {
           <p className="text-lg text-gray-600 mb-8">
             Search your career opportunity through 12,800 jobs
           </p>
-          <form onSubmit={handleSearch} className="bg-white rounded-full shadow-lg p-2.5 flex flex-col lg:flex-row items-center w-full mx-auto gap-2 lg:gap-0">
-            <div className="flex items-center flex-1 pl-4 pr-2 w-full lg:w-auto">
-              <Search className="text-gray-400 mr-3" size={20} />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Job title, keywords..."
-                className="w-full focus:outline-none bg-transparent text-gray-700"
-              />
-            </div>
-            
-            <div className="hidden lg:block w-px h-8 bg-gray-200"></div>
-
-            <div className="relative flex items-center flex-1 px-4 w-full lg:w-auto">
-              <MapPin className="text-gray-400 mr-3" size={20} />
-              <input
-                type="text"
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-                placeholder="City or postcode"
-                className="w-full focus:outline-none bg-transparent text-gray-700"
-              />
-              <ChevronDown className="text-gray-400 pointer-events-none" size={16} />
-            </div>
-
-            <div className="hidden lg:block w-px h-8 bg-gray-200"></div>
-
-            <div className="relative flex items-center flex-1 px-4 w-full lg:w-auto">
-              <Briefcase className="text-gray-400 mr-3" size={20} />
-              <select
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-                className="w-full focus:outline-none bg-transparent text-gray-700 appearance-none pr-4"
-              >
-                <option value="">All Categories</option>
-                <option value="technology">Technology</option>
-                <option value="healthcare">Healthcare</option>
-                <option value="finance">Finance</option>
-                <option value="education">Education</option>
-              </select>
-              <ChevronDown className="text-gray-400 pointer-events-none absolute right-4" size={16} />
-            </div>
-
-            <Button type="submit" variant="primary" className="rounded-full !px-6 !py-3 !text-base w-full lg:w-auto">Find Jobs</Button>
-          </form>
+          <SearchBar 
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+            searchResults={searchResults}
+            isSearching={isSearching}
+            searchTerm={searchTerm}
+          />
         </div>
       </section>
+
+      {/* Search Results */}
+      {showSearchResults && (
+        <section className="py-12 bg-gray-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-20">
+            <SearchResults 
+              jobs={searchResults}
+              loading={isSearching}
+              error={null}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Featured Jobs Section */}
       <section ref={featuredRef} className="py-16 bg-white">
